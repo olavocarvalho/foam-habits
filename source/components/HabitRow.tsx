@@ -40,13 +40,15 @@ export default function HabitRow({habit, dates, nameWidth}: Props) {
 				})}
 			</Box>
 
-			{/* Streak */}
-			<Box marginLeft={1}>
-				<Text color={PALETTE.dimmed}>
-					({habit.streak} {streakLabel})
-				</Text>
-				{showFire && <Text> 🔥</Text>}
-			</Box>
+			{/* Streak - only show if > 0 */}
+			{habit.streak > 0 && (
+				<Box marginLeft={1}>
+					<Text color={PALETTE.dimmed}>
+						{habit.streak} {streakLabel}
+					</Text>
+					{showFire && <Text> 🔥</Text>}
+				</Box>
+			)}
 		</Box>
 	);
 }

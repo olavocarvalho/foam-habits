@@ -7,12 +7,15 @@ import {useHabitData} from './hooks/useHabitData.js';
 import {PALETTE} from './lib/palette.js';
 import {type ViewArgs} from './lib/schemas.js';
 
-type Props = ViewArgs;
+type Props = ViewArgs & {
+	referenceDate?: Date;
+};
 
-export default function App({weeks, currentMonth}: Props) {
+export default function App({weeks, currentMonth, referenceDate}: Props) {
 	const {habits, dates, warnings, loading, error} = useHabitData({
 		weeks,
 		currentMonth,
+		referenceDate,
 	});
 
 	let content: React.ReactElement;

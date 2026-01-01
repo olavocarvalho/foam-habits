@@ -27,7 +27,7 @@ export default function Header({dates, nameWidth, weeks, currentMonth}: Props) {
 	dates.forEach((date, index) => {
 		const parsed = parseISO(date);
 		const monthKey = format(parsed, 'yyyy-MM');
-		const day = format(parsed, 'dd'); // 2-digit day (01, 02, ... 31)
+		const day = format(parsed, 'd'); // 1-2 digit day (1, 2, ... 31)
 		const monthAbbr = format(parsed, 'MMM');
 
 		const isFirstOfMonth = !seenMonths.has(monthKey);
@@ -48,13 +48,15 @@ export default function Header({dates, nameWidth, weeks, currentMonth}: Props) {
 			monthLine += monthAbbr;
 		}
 
-		// Day line: show 2-digit day at key positions
+		// Day line: show day at key positions
 		if (showDayLabel) {
 			// Pad to current position if needed
 			while (dayLine.length < index) {
 				dayLine += ' ';
 			}
-			dayLine += day;
+			// Pad single-digit days with leading space for alignment
+			const dayStr = day.length === 1 ? ` ${day}` : day;
+			dayLine += dayStr;
 		}
 	});
 

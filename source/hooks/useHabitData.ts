@@ -4,6 +4,10 @@ import {loadConfig, getRootDir} from '../lib/config.js';
 import {parseJournals} from '../lib/parser.js';
 import {aggregateHabits, getDateRange} from '../lib/tracker.js';
 
+export type UseHabitDataArgs = ViewArgs & {
+	referenceDate?: Date;
+};
+
 export type UseHabitDataResult = {
 	habits: HabitData[];
 	dates: string[];
@@ -12,7 +16,7 @@ export type UseHabitDataResult = {
 	error: Error | undefined;
 };
 
-export function useHabitData(args: ViewArgs): UseHabitDataResult {
+export function useHabitData(args: UseHabitDataArgs): UseHabitDataResult {
 	const [habits, setHabits] = useState<HabitData[]>([]);
 	const [dates, setDates] = useState<string[]>([]);
 	const [warnings, setWarnings] = useState<string[]>([]);
@@ -29,10 +33,10 @@ export function useHabitData(args: ViewArgs): UseHabitDataResult {
 			const {entries, warnings: parseWarnings} = parseJournals(rootDir, config);
 
 			// Get date range for display
-			const dateRange = getDateRange(args);
+			const dateRange = getDateRange(args, args.referenceDate);
 
 			// Aggregate habit data
-			const habitData = aggregateHabits(entries, config, dateRange);
+			const habitData = aggregateHabits(entries, config, dateRange, args.referenceDate);
 
 			setHabits(habitData);
 			setDates(dateRange);
@@ -42,7 +46,7 @@ export function useHabitData(args: ViewArgs): UseHabitDataResult {
 			setError(err instanceof Error ? err : new Error(String(err)));
 			setLoading(false);
 		}
-	}, [args.weeks, args.currentMonth]);
+	}, [args.weeks, args.currentMonth, args.referenceDate]);
 
 	return {habits, dates, warnings, loading, error};
 }

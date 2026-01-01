@@ -11,7 +11,7 @@ type Props = {
 	currentMonth: boolean;
 };
 
-const MAX_NAME_WIDTH = 12;
+const MAX_NAME_WIDTH = 18;
 const MIN_NAME_WIDTH = 5;
 
 export default function Heatmap({habits, dates, weeks, currentMonth}: Props) {

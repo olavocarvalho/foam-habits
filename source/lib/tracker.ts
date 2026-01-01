@@ -17,9 +17,11 @@ import {
 
 /**
  * Generate date range based on view args
+ * @param args - View arguments (weeks, currentMonth)
+ * @param referenceDate - Reference date for calculations (defaults to today, useful for testing)
  */
-export function getDateRange(args: ViewArgs): string[] {
-	const today = new Date();
+export function getDateRange(args: ViewArgs, referenceDate?: Date): string[] {
+	const today = referenceDate ?? new Date();
 	let startDate: Date;
 	let endDate: Date = today;
 
@@ -42,14 +44,16 @@ export function getDateRange(args: ViewArgs): string[] {
 
 /**
  * Calculate current streak for a habit
- * Streak = consecutive days with completion, going backwards from today
+ * Streak = consecutive days with completion, going backwards from reference date
+ * @param referenceDate - Reference date for calculations (defaults to today, useful for testing)
  */
 function calculateStreak(
 	entries: Record<string, number | undefined>,
 	goal: number | undefined,
 	threshold: number,
+	referenceDate?: Date,
 ): number {
-	const today = new Date();
+	const today = referenceDate ?? new Date();
 	let streak = 0;
 	let currentDate = today;
 
@@ -78,14 +82,16 @@ function calculateStreak(
 
 /**
  * Aggregate habit entries into HabitData for rendering
+ * @param referenceDate - Reference date for calculations (defaults to today, useful for testing)
  */
 export function aggregateHabits(
 	entries: HabitEntry[],
 	config: Config,
 	dateRange: string[],
+	referenceDate?: Date,
 ): HabitData[] {
 	const habits: HabitData[] = [];
-	const today = new Date();
+	const today = referenceDate ?? new Date();
 
 	// Process each habit from config (maintains order)
 	for (const [habitKey, habitConfig] of Object.entries(config.habits)) {
@@ -126,7 +132,7 @@ export function aggregateHabits(
 			unit: goalUnit,
 			threshold,
 			entries: displayEntries,
-			streak: calculateStreak(habitEntries, goalValue, threshold),
+			streak: calculateStreak(habitEntries, goalValue, threshold, today),
 		});
 	}
 

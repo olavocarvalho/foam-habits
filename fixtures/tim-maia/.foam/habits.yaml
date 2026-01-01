@@ -1,0 +1,15 @@
+habits:
+  Wake up late:
+    emoji: "😴"
+
+  Smoke joints:
+    emoji: "🌿"
+    goal: "4"
+    threshold: 0.75
+
+  Drink whiskey:
+    emoji: "🥃"
+    goal: "1L"
+
+  Skip rehearsal:
+    emoji: "🎤"
