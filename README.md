@@ -1,9 +1,9 @@
 # foam-habits
 
-A habit tracker that reads from [Foam](https://foambubble.github.io/foam/) daily notes and output a rich output in your termimal.
+A terminal habit tracker that reads from [Foam](https://foambubble.github.io/foam/) daily notes and displays a GitHub-style heatmap.
 
 ```
-Foam Habits - Last 28 Days
+Foam Habits / Last 28 Days
 
                Dec                      Jan
 Habit          05    12    19    25     01
@@ -15,12 +15,18 @@ Habit          05    12    19    25     01
 🤸 Mobility    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░ (0 days)
 ```
 
+## Prerequisites
+
+- Node.js >= 16
+
 ## Installation
 
 ```bash
-cd tools/foam-habits
-npm install
-npm run build
+# Run without installing
+npx foam-habits
+
+# Or install globally
+npm install -g foam-habits
 ```
 
 ## Configuration
@@ -62,6 +68,8 @@ habits:
 
 ## Journal Format
 
+The tool automatically detects your journal folder from `.foam/templates/daily-note.md`. Falls back to `journal/` if not found.
+
 In your daily notes (`journal/YYYY-MM-DD.md`), add a `## Habits` section:
 
 ```markdown
@@ -89,13 +97,16 @@ The habit name matching is case-insensitive.
 
 ```bash
 # From your Foam workspace root
-./tools/foam-habits/dist/cli.js
+foam-habits
 
 # Show last 2 weeks
-./tools/foam-habits/dist/cli.js --weeks 2
+foam-habits --weeks 2
 
 # Show current month
-./tools/foam-habits/dist/cli.js --current-month
+foam-habits --current-month
+
+# Or use npx without installing
+npx foam-habits --weeks 4
 ```
 
 ### Options
@@ -123,23 +134,21 @@ When a streak exceeds 7 days, a fire emoji appears for extra motivation.
 
 ## Tips
 
-1. **Add an alias** for quick access:
+1. **Use thresholds** for flexibility. Set `threshold: 0.8` to consider a habit done at 80% of the goal.
 
-   ```bash
-   alias habits='./tools/foam-habits/dist/cli.js'
-   ```
+2. **Keep habits simple**. Boolean habits (no goal) are great for habits you just want to track presence/absence.
 
-2. **Use thresholds** for flexibility. Set `threshold: 0.8` to consider a habit done at 80% of the goal.
-
-3. **Keep habits simple**. Boolean habits (no goal) are great for habits you just want to track presence/absence.
+3. **Run from workspace root**. The tool looks for `.foam/habits.yaml` and `journal/` in the current directory.
 
 ## Development
 
 ```bash
-cd tools/foam-habits
+git clone https://github.com/olavocarvalho/foam-habits.git
+cd foam-habits
 npm install
 npm run build
-npm run dev  # Watch mode
+npm test        # Run 42 unit tests
+npm run dev     # Watch mode
 ```
 
 ## Roadmap
