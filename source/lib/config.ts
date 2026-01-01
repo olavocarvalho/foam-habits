@@ -40,12 +40,11 @@ export function loadConfig(configPath?: string): Config {
 			'Could not find .foam/habits.yaml\n\n' +
 				'Create a config file at .foam/habits.yaml with your habits:\n\n' +
 				'  habits:\n' +
-				'    gym:\n' +
-				'      emoji: "🏋️"\n' +
-				'    water:\n' +
-				'      emoji: "💧"\n' +
-				'      goal: 3\n' +
-				'      unit: "L"\n',
+				'    Gym:\n' +
+				'      emoji: 💪\n' +
+				'    Drink water:\n' +
+				'      emoji: 💧\n' +
+				'      goal: 3L\n',
 		);
 	}
 
