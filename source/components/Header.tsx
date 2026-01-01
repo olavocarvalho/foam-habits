@@ -45,6 +45,10 @@ export default function Header({dates, nameWidth, weeks, currentMonth}: Props) {
 			while (monthLine.length < index) {
 				monthLine += ' ';
 			}
+			// Add leading space for single-digit days to align with day line
+			if (day.length === 1) {
+				monthLine += ' ';
+			}
 			monthLine += monthAbbr;
 		}
 
