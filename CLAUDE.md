@@ -1,0 +1,175 @@
+# foam-habits Architecture Guide
+
+A terminal habit tracker for [Foam](https://foambubble.github.io/foam/) daily notes that displays a GitHub-style heatmap.
+
+## Overview
+
+foam-habits parses habit entries from Foam daily notes (`journal/*.md`) and displays completion status as a terminal heatmap with streaks.
+
+```
+Foam Habits / Last 28 Days
+
+               Dec                      Jan
+Habit          05    12    19    25     01
+
+💪 Gym         ░░░░░█░░░░░░░░░░░░░░░░░░░░░█ (1 day)
+💧 Drink water ░░░░░░░░░░░░░░░░░░░░░░░░░░░▓ (0 days)
+📖 Study       ░░░░░░░░░░░░░░░░░░░░░░░░░░░░ (0 days)
+🧘 Meditation  ░░░░░░░░░░░░░░░░░░░░░░░░░░░█ (1 day)
+```
+
+## Architecture
+
+```
+foam-habits/
+├── source/
+│   ├── app.tsx              # Main Ink app with loading state
+│   ├── cli.tsx              # CLI entry point (meow args parser)
+│   │
+│   ├── components/
+│   │   ├── Cell.tsx         # Single heatmap cell (░▒▓█)
+│   │   ├── HabitRow.tsx     # Habit row: emoji + name + cells + streak
+│   │   ├── Header.tsx       # Title + date column headers
+│   │   ├── Heatmap.tsx      # Main grid container
+│   │   └── Warnings.tsx     # Static warnings display
+│   │
+│   ├── hooks/
+│   │   └── useHabitData.ts  # React hook for data loading
+│   │
+│   └── lib/
+│       ├── schemas.ts       # Zod schemas + types
+│       ├── config.ts        # Load habits.yaml
+│       ├── parser.ts        # Parse journal markdown files
+│       ├── tracker.ts       # Aggregate data, calculate streaks
+│       ├── palette.ts       # Color constants
+│       └── string-utils.ts  # Visual string width utilities
+│
+├── dist/                    # Compiled JavaScript (npm publish)
+└── package.json
+```
+
+## Data Flow
+
+```
+┌─────────────────────┐     ┌─────────────┐     ┌─────────────┐
+│ .foam/templates/    │────▶│   parser    │────▶│   tracker   │
+│ daily-note.md       │     │ (infers     │     │ (aggregates │
+│ (infers journal/)   │     │  journal/)  │     │  + streaks) │
+└─────────────────────┘     └─────────────┘     └─────────────┘
+                                   │                   │
+┌─────────────────────┐            │                   │
+│ .foam/habits.yaml   │────────────┼───────────────────┤
+└─────────────────────┘            │                   │
+                                   ▼                   ▼
+                          ┌─────────────────────────────────┐
+                          │        useHabitData() hook      │
+                          └─────────────────────────────────┘
+                                          │
+                                          ▼
+                          ┌─────────────────────────────────┐
+                          │     Ink Components (React)      │
+                          │  Header → Heatmap → HabitRow    │
+                          └─────────────────────────────────┘
+```
+
+## Key Files
+
+### `source/lib/schemas.ts`
+Zod schemas defining data structures:
+- `HabitConfigSchema` - habit config from yaml (emoji, goal, threshold)
+- `ConfigSchema` - full habits.yaml structure
+- `HabitEntrySchema` - single day's habit entry
+- `HabitDataSchema` - aggregated habit data for display
+- `parseGoal()` - parse goal strings like "4L" → {value: 4, unit: "L"}
+
+### `source/lib/parser.ts`
+Parses journal markdown files:
+- `inferJournalFolder()` - reads `.foam/templates/daily-note.md` to find journal folder
+- `extractHabitsSection()` - extracts `## Habits` section from markdown
+- `parseHabitEntries()` - parses habit list items into structured data
+- `parseJournals()` - main entry point for parsing all journal files
+
+### `source/lib/tracker.ts`
+Aggregates habit data:
+- `getDateRange()` - generate date range based on view args
+- `aggregateHabits()` - combine entries into HabitData for rendering
+- `getCompletionLevel()` - calculate 0-3 completion level for cells
+
+### `source/components/Cell.tsx`
+Renders completion symbols with colors:
+- `░` (dim) - not done
+- `▒` (red) - low progress
+- `▓` (yellow) - partial progress
+- `█` (green) - complete
+
+## Tech Stack
+
+| Component | Choice | Rationale |
+|-----------|--------|-----------|
+| Framework | Ink | React for CLIs, component-based UI |
+| Validation | Zod | Runtime validation, type inference |
+| YAML | js-yaml | Standard, reliable |
+| Dates | date-fns | Lightweight, tree-shakeable |
+| CLI Args | meow | Simple, flexible argument parsing |
+
+## Configuration
+
+### habits.yaml
+```yaml
+habits:
+  Gym:
+    emoji: 💪
+
+  Drink water:
+    emoji: 💧
+    goal: 4L          # Numeric goal with unit
+    threshold: 0.8    # 80% = complete (optional, default 1.0)
+```
+
+### Daily Note Format
+```markdown
+## Habits
+
+- Gym
+- Drink water: 3.5L
+- Meditation
+```
+
+## CLI Usage
+
+```bash
+foam-habits                  # Last 4 weeks
+foam-habits --weeks 12       # Last 12 weeks
+foam-habits --current-month  # Current month only
+```
+
+## Testing
+
+42 unit tests using ava:
+```bash
+npm test
+```
+
+Tests cover:
+- `parseGoal()` - goal string parsing
+- `getCompletionLevel()` - completion level calculation
+- `extractHabitsSection()` - markdown section extraction
+- `parseHabitEntries()` - habit entry parsing
+- `parseFolderFromTemplate()` - journal folder inference
+
+## Extending
+
+### Adding a new component
+1. Create in `source/components/`
+2. Use Ink's `Box` and `Text` components
+3. Import color constants from `lib/palette.ts`
+
+### Adding a new CLI option
+1. Add flag in `source/cli.tsx` meow config
+2. Pass to `<App>` component
+3. Handle in `useHabitData` hook or components
+
+### Adding a new habit field
+1. Update `HabitConfigSchema` in `schemas.ts`
+2. Handle in `aggregateHabits()` in `tracker.ts`
+3. Use in components as needed
