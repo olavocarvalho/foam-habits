@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] - 2026-01-01
+
+### Fixed
+- Align month header with single-digit days (e.g., "Apr" now aligns with " 1")
+
 ## [1.1.0] - 2026-01-01
 
 ### Added
