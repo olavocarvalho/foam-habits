@@ -1,6 +1,6 @@
 {
 	"name": "foam-habits",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Terminal habit tracker for Foam daily notes with GitHub-style heatmap",
 	"license": "MIT",
 	"author": "Olavo Carvalho",
