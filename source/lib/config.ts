@@ -10,6 +10,13 @@ export class ConfigError extends Error {
 	}
 }
 
+export class ConfigNotFoundError extends ConfigError {
+	constructor() {
+		super('Config not found');
+		this.name = 'ConfigNotFoundError';
+	}
+}
+
 /**
  * Find the .foam/habits.yaml config file by searching up from cwd
  */
@@ -36,16 +43,7 @@ export function loadConfig(configPath?: string): Config {
 	const resolvedPath = configPath ?? findConfigPath();
 
 	if (!resolvedPath) {
-		throw new ConfigError(
-			'Could not find .foam/habits.yaml\n\n' +
-				'Create a config file at .foam/habits.yaml with your habits:\n\n' +
-				'  habits:\n' +
-				'    Gym:\n' +
-				'      emoji: 💪\n' +
-				'    Drink water:\n' +
-				'      emoji: 💧\n' +
-				'      goal: 3L\n',
-		);
+		throw new ConfigNotFoundError();
 	}
 
 	if (!fs.existsSync(resolvedPath)) {
@@ -87,4 +85,41 @@ export function getRootDir(configPath?: string): string {
 	}
 	// .foam/habits.yaml -> go up two levels
 	return path.dirname(path.dirname(resolvedPath));
+}
+
+const DEFAULT_CONFIG = `# Foam Habits Configuration
+# See: https://github.com/olavocarvalho/foam-habits
+
+habits:
+  Exercise:
+    emoji: 💪
+
+  Drink water:
+    emoji: 💧
+    goal: 2L
+
+  Read:
+    emoji: 📖
+    goal: 30min
+    threshold: 0.8  # Consider done at 80% (24min)
+
+  Meditate:
+    emoji: 🧘
+`;
+
+/**
+ * Create a default habits.yaml config file
+ */
+export function createDefaultConfig(rootDir: string = process.cwd()): string {
+	const foamDir = path.join(rootDir, '.foam');
+	const configPath = path.join(foamDir, 'habits.yaml');
+
+	// Create .foam directory if it doesn't exist
+	if (!fs.existsSync(foamDir)) {
+		fs.mkdirSync(foamDir, {recursive: true});
+	}
+
+	fs.writeFileSync(configPath, DEFAULT_CONFIG, 'utf8');
+
+	return configPath;
 }

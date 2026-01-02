@@ -6,6 +6,7 @@ import {aggregateHabits, getDateRange} from '../lib/tracker.js';
 
 export type UseHabitDataArgs = ViewArgs & {
 	referenceDate?: Date;
+	reloadTrigger?: boolean;
 };
 
 export type UseHabitDataResult = {
@@ -24,6 +25,9 @@ export function useHabitData(args: UseHabitDataArgs): UseHabitDataResult {
 	const [error, setError] = useState<Error | undefined>();
 
 	useEffect(() => {
+		setLoading(true);
+		setError(undefined);
+
 		try {
 			// Load config
 			const config = loadConfig();
@@ -43,10 +47,11 @@ export function useHabitData(args: UseHabitDataArgs): UseHabitDataResult {
 			setWarnings(parseWarnings);
 			setLoading(false);
 		} catch (err) {
+			// Preserve the original error type for instanceof checks
 			setError(err instanceof Error ? err : new Error(String(err)));
 			setLoading(false);
 		}
-	}, [args.weeks, args.currentMonth, args.referenceDate]);
+	}, [args.weeks, args.currentMonth, args.referenceDate, args.reloadTrigger]);
 
 	return {habits, dates, warnings, loading, error};
 }
