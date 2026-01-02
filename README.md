@@ -2,6 +2,8 @@
 
 A terminal habit tracker that reads from [Foam](https://foambubble.github.io/foam/) daily notes and displays a GitHub-style heatmap.
 
+![foam-habits demo](fixtures/tim-maia/demo.gif)
+
 ```
 Foam Habits / Last 28 Days
 
