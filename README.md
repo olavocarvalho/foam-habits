@@ -4,6 +4,8 @@ A terminal habit tracker that reads from [Foam](https://foambubble.github.io/foa
 
 ![foam-habits demo](fixtures/tim-maia/demo.gif)
 
+*Demo features controversial habits from [Tim Maia](https://en.wikipedia.org/wiki/Tim_Maia) — a homage in our test fixture :D*
+
 ## Prerequisites
 
 - Node.js >= 16
