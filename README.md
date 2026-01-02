@@ -138,7 +138,7 @@ git clone https://github.com/olavocarvalho/foam-habits.git
 cd foam-habits
 npm install
 npm run build
-npm test        # Run 42 unit tests
+npm test      
 npm run dev     # Watch mode
 ```
 
@@ -164,6 +164,19 @@ npm run dev     # Watch mode
   Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
 
 - [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
+
+- [ ] **Log habit from CLI**: Quickly log habits without opening your daily note:
+  ```bash
+  # Log a boolean habit
+  npx foam-habits log "Gym"
+
+  # Log a quantitative habit
+  npx foam-habits log "Drink water: 0.5L"
+
+  # Log to a specific date
+  npx foam-habits log "Drink water: 0.5L" --reference-date 2025-01-01
+  ```
+  If the habit already exists in the note with a value, sum the new value (e.g., logging `0.5L` twice results in `1L`). Creates the daily note if it doesn't exist.
 
 ## License
 
