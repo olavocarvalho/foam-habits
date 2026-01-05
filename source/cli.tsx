@@ -158,6 +158,22 @@ if (cli.flags.log) {
 if (cli.flags.history || cli.flags['H']) {
 	const habitName = cli.flags.history || (cli.flags['H'] as string);
 
+	// Parse reference date if provided
+	let referenceDate: Date | undefined;
+	if (cli.flags.referenceDate) {
+		const parsed = parseDateString(cli.flags.referenceDate);
+		if (!parsed) {
+			console.error(`Invalid date format: ${cli.flags.referenceDate}`);
+			console.error('Expected format: YYYY-MM-DD');
+			process.exit(1);
+		}
+		referenceDate = new Date(parsed.year, parsed.month, parsed.day);
+		if (Number.isNaN(referenceDate.getTime())) {
+			console.error(`Invalid date: ${cli.flags.referenceDate}`);
+			process.exit(1);
+		}
+	}
+
 	try {
 		const config = loadConfig();
 		const rootDir = getRootDir();
@@ -199,6 +215,7 @@ if (cli.flags.history || cli.flags['H']) {
 				weeks={cli.flags.weeks}
 				startDate={habitConfig['start-date']}
 				schedule={habitConfig.schedule}
+				referenceDate={referenceDate}
 			/>,
 		);
 	} catch (error) {

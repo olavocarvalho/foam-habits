@@ -1,6 +1,7 @@
 import React from 'react';
 import {Box, Text} from 'ink';
 import {PALETTE} from '../lib/palette.js';
+import {isScheduledForDate} from '../lib/tracker.js';
 import type {HistoryEntry} from '../lib/parser.js';
 import type {Schedule} from '../lib/schemas.js';
 
@@ -30,17 +31,51 @@ type Props = {
 	weeks: number;
 	startDate?: string;
 	schedule: Schedule;
+	referenceDate?: Date;
 };
 
-function formatSchedule(schedule: Schedule): string {
-	if (schedule === 'daily') return 'Daily';
-	if (schedule === 'weekdays') return 'Weekdays (Mon-Fri)';
-	if (schedule === 'weekends') return 'Weekends (Sat-Sun)';
-	if (Array.isArray(schedule)) {
-		const days = schedule.map(d => d.charAt(0).toUpperCase() + d.slice(1));
-		return days.join('/');
+const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const DAY_ABBREV_TO_FULL: Record<string, string> = {
+	mon: 'Mon',
+	tue: 'Tue',
+	wed: 'Wed',
+	thu: 'Thu',
+	fri: 'Fri',
+	sat: 'Sat',
+	sun: 'Sun',
+};
+
+function getScheduledDays(schedule: Schedule): Set<string> {
+	if (schedule === 'daily') {
+		return new Set(ALL_DAYS);
 	}
-	return 'Daily';
+	if (schedule === 'weekdays') {
+		return new Set(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
+	}
+	if (schedule === 'weekends') {
+		return new Set(['Sat', 'Sun']);
+	}
+	if (Array.isArray(schedule)) {
+		return new Set(schedule.map(d => DAY_ABBREV_TO_FULL[d] ?? d));
+	}
+	return new Set(ALL_DAYS);
+}
+
+function ScheduleDisplay({schedule}: {schedule: Schedule}) {
+	const scheduledDays = getScheduledDays(schedule);
+
+	return (
+		<>
+			{ALL_DAYS.map((day, idx) => (
+				<React.Fragment key={day}>
+					<Text color={scheduledDays.has(day) ? PALETTE.title : PALETTE.dimmed}>
+						{day}
+					</Text>
+					{idx < ALL_DAYS.length - 1 && <Text dimColor> / </Text>}
+				</React.Fragment>
+			))}
+		</>
+	);
 }
 
 function getCompletionLevel(
@@ -70,9 +105,10 @@ export default function HistoryView({
 	weeks,
 	startDate: habitStartDate,
 	schedule,
+	referenceDate,
 }: Props) {
 	// Filter entries to the specified number of weeks
-	const today = new Date();
+	const today = referenceDate ?? new Date();
 	const rangeStart = new Date(today);
 	rangeStart.setDate(rangeStart.getDate() - weeks * 7);
 	const rangeStartStr = rangeStart.toISOString().slice(0, 10);
@@ -90,16 +126,20 @@ export default function HistoryView({
 	// Create a map for quick lookup
 	const entryMap = new Map(filteredEntries.map(e => [e.date, e]));
 
-	// Format schedule info
-	const scheduleStr = formatSchedule(schedule);
+	// Capitalize first letter of each word in habit name
+	const capitalizedName = habitName
+		.split(' ')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
 
 	return (
 		<Box flexDirection="column" paddingTop={1}>
 			<Text color={PALETTE.title}>
-				{emoji} {habitName} - Last {weeks * 7} days
+				{emoji} {capitalizedName} - Last {weeks * 7} days
 			</Text>
 			<Box>
-				<Text dimColor>Schedule: {scheduleStr}</Text>
+				<Text dimColor>Schedule: </Text>
+				<ScheduleDisplay schedule={schedule} />
 				{habitStartDate && (
 					<Text dimColor>  |  Started: {habitStartDate}</Text>
 				)}
@@ -107,6 +147,22 @@ export default function HistoryView({
 			<Text> </Text>
 			{allDates.map(date => {
 				const entry = entryMap.get(date);
+
+				// Check if date is before start date or not scheduled
+				const isBeforeStart =
+					habitStartDate !== undefined && date < habitStartDate;
+				const isNotScheduled = !isScheduledForDate(date, schedule);
+
+				// Show blank for unscheduled/before-start days
+				if (isBeforeStart || isNotScheduled) {
+					return (
+						<Box key={date}>
+							<Text dimColor>{date}</Text>
+							<Text>   </Text>
+						</Box>
+					);
+				}
+
 				const level = getCompletionLevel(entry?.value, goal, threshold);
 				const color = COLORS[level];
 				const symbol = SYMBOLS[level];

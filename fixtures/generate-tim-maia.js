@@ -19,6 +19,8 @@
  * - Checkbox format in ~20% of entries (e.g., "- [x] Gym")
  * - start-date config (Call manager starts mid-fixture)
  * - schedule config (Gym is weekdays only)
+ * - Habit observations in Notes section (~40% of logged habits)
+ *   Format: - **Habit:** observation text
  *
  * Usage:
  *   node fixtures/generate-tim-maia.js
@@ -109,6 +111,47 @@ const funNotes = [
 	'',
 ];
 
+// Habit observations for --history feature
+const habitObservations = {
+	'Wake up late': [
+		'Slept until 2pm, feeling refreshed',
+		'Dreams about the new album',
+		'Neighbors complained again',
+		'',
+	],
+	'Smoke joints': [
+		'Good stuff from Bahia',
+		'Shared with the band',
+		'Inspired some new lyrics',
+		'',
+	],
+	'Drink whiskey': [
+		'Imported from Scotland',
+		'Celebrating the new single',
+		'Mixed with coconut water',
+		'',
+	],
+	'Skip rehearsal': [
+		'The band can handle it',
+		'Had better things to do',
+		'Will make it up tomorrow',
+		'',
+	],
+	'Call manager': [
+		'Discussed the tour dates',
+		'Negotiating better contracts',
+		'He wants more shows, I want more money',
+		'',
+	],
+	'Gym': [
+		'Leg day - felt strong',
+		'Upper body workout',
+		'Light cardio only',
+		'New personal record on bench press',
+		'',
+	],
+};
+
 /**
  * Format entry with optional emoji prefix and checkbox format
  * @param {string} habitName - The habit name
@@ -150,20 +193,36 @@ function isWeekday(dateStr) {
 }
 
 /**
+ * Get random observation for a habit (~40% chance)
+ */
+function getObservation(habitName) {
+	if (Math.random() > 0.4) return null; // 60% chance of no observation
+	const observations = habitObservations[habitName];
+	if (!observations) return null;
+	const obs = observations[Math.floor(Math.random() * observations.length)];
+	return obs || null;
+}
+
+/**
  * Generate a single day's journal content
  */
 function generateDay(date) {
 	const habits = [];
+	const observations = [];
 
 	// Wake up late - ~85% of the time
 	if (Math.random() < 0.85) {
 		habits.push(formatEntry('Wake up late', '😴'));
+		const obs = getObservation('Wake up late');
+		if (obs) observations.push(`- **Wake up late:** ${obs}`);
 	}
 
 	// Smoke joints - varies from 0-6, usually 1-5
 	const joints = Math.random() < 0.9 ? Math.floor(Math.random() * 5) + 1 : 0;
 	if (joints > 0) {
 		habits.push(formatEntry('Smoke joints', '🌿', joints));
+		const obs = getObservation('Smoke joints');
+		if (obs) observations.push(`- **Smoke joints:** ${obs}`);
 	}
 
 	// Drink whiskey - varies, sometimes heavy, sometimes light
@@ -171,24 +230,39 @@ function generateDay(date) {
 		Math.random() < 0.85 ? (Math.random() * 1.3 + 0.2).toFixed(1) : 0;
 	if (whiskey > 0) {
 		habits.push(formatEntry('Drink whiskey', '🥃', `${whiskey}L`));
+		const obs = getObservation('Drink whiskey');
+		if (obs) observations.push(`- **Drink whiskey:** ${obs}`);
 	}
 
 	// Skip rehearsal - ~45% of days
 	if (Math.random() < 0.45) {
 		habits.push(formatEntry('Skip rehearsal', '🎤'));
+		const obs = getObservation('Skip rehearsal');
+		if (obs) observations.push(`- **Skip rehearsal:** ${obs}`);
 	}
 
 	// Call manager - ~60% of days, only after 1989-03-20 (start-date)
 	if (date >= '1989-03-20' && Math.random() < 0.6) {
 		habits.push(formatEntry('Call manager', '📞'));
+		const obs = getObservation('Call manager');
+		if (obs) observations.push(`- **Call manager:** ${obs}`);
 	}
 
 	// Gym - ~70% of weekdays only (schedule: weekdays)
 	if (isWeekday(date) && Math.random() < 0.7) {
 		habits.push(formatEntry('Gym', '🏋️'));
+		const obs = getObservation('Gym');
+		if (obs) observations.push(`- **Gym:** ${obs}`);
 	}
 
 	const note = funNotes[Math.floor(Math.random() * funNotes.length)];
+
+	// Build notes section with observations first, then general note
+	const notesContent = [...observations];
+	if (note) {
+		if (notesContent.length > 0) notesContent.push('');
+		notesContent.push(note);
+	}
 
 	return `# ${date}
 
@@ -198,7 +272,7 @@ ${habits.join('\n')}
 
 ## Notes
 
-${note}
+${notesContent.join('\n')}
 `;
 }
 

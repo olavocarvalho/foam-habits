@@ -505,3 +505,41 @@ test('extractObservation: handles asterisk list marker', t => {
 
 	t.is(extractObservation(content, 'Gym'), 'Leg day');
 });
+
+test('extractObservation: handles colon outside bold', t => {
+	const content = `# 2025-01-01
+
+## Notes
+
+- **Gym**: Train A, back and chest day`;
+
+	t.is(extractObservation(content, 'Gym'), 'Train A, back and chest day');
+});
+
+test('extractObservation: finds observation in intro area', t => {
+	const content = `# 2025-01-01
+
+- **Gym:** Train A - back day
+
+## Habits
+
+- Gym`;
+
+	t.is(extractObservation(content, 'Gym'), 'Train A - back day');
+});
+
+test('extractObservation: merges intro and ## Notes', t => {
+	const content = `# 2025-01-01
+
+- **Gym:** From intro
+
+## Notes
+
+- **Gym:** From notes section
+
+## Habits
+
+- Gym`;
+
+	t.is(extractObservation(content, 'Gym'), 'From intro | From notes section');
+});

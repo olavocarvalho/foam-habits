@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.6.1] - 2026-01-05
+
+### Added
+- Support observations in intro area (between `# Title` and first `##` section)
+- Support both `**Habit:**` and `**Habit**:` observation formats
+- Merge observations from intro and `## Notes` with ` | ` separator
+- `--reference-date` support for `--history` flag
+- 5 new e2e tests for `--history` feature
+- 2 new parser tests for intro section observations
+
+### Changed
+- History view shows blank for unscheduled days and before start-date
+- Schedule display shows all 7 days with active days highlighted in purple
+- Habit name capitalized in history title (e.g., "Gym" not "gym")
+- Fixture generator now includes habit observations
+
 ## [1.6.0] - 2026-01-05
 
 ### Added

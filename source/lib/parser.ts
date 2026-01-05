@@ -22,9 +22,11 @@ const LIST_ITEM_REGEX = /^[-*]\s+(?:\[([xX\s])\]\s*)?(.+)$/;
 // Matches emoji presentation sequences, extended pictographics, ZWJ sequences, and whitespace
 const LEADING_EMOJI_REGEX = /^(?:[\p{Emoji_Presentation}\p{Extended_Pictographic}]|\u200D|\uFE0F|\s)+/u;
 
-// Regex to match observation entries in Notes section: - **HabitName:** observation text
-// The colon is INSIDE the bold: **Gym:** not **Gym**:
-const OBSERVATION_REGEX = /^[-*]\s+\*\*([^*:]+):\*\*\s*(.+)$/;
+// Regex to match observation entries in Notes section
+// Supports both formats:
+//   - **Gym:** observation (colon inside bold)
+//   - **Gym**: observation (colon outside bold)
+const OBSERVATION_REGEX = /^[-*]\s+\*\*([^*:]+):?\*\*:?\s*(.+)$/;
 
 // Default folder if template doesn't exist or can't be parsed
 const DEFAULT_JOURNAL_FOLDER = 'journal';
@@ -162,27 +164,62 @@ export function extractNotesSection(content: string): string | undefined {
 }
 
 /**
- * Extract observation for a specific habit from the Notes section
- * Looks for pattern: - **HabitName:** observation text
+ * Extract the intro section (between # Title and first ## section)
+ */
+export function extractIntroSection(content: string): string | undefined {
+	const lines = content.split('\n');
+	const introLines: string[] = [];
+	let passedTitle = false;
+
+	for (const line of lines) {
+		// Skip until we pass the # Title
+		if (!passedTitle && /^#\s+/.test(line)) {
+			passedTitle = true;
+			continue;
+		}
+		// Stop at first ## section
+		if (passedTitle && /^##\s+/.test(line)) {
+			break;
+		}
+		if (passedTitle) {
+			introLines.push(line);
+		}
+	}
+
+	return introLines.length > 0 ? introLines.join('\n') : undefined;
+}
+
+/**
+ * Extract observation for a specific habit
+ * Searches both intro area (after # Title) and ## Notes section
+ * If found in both, merges with " | " separator
  */
 export function extractObservation(
 	content: string,
 	habitName: string,
 ): string | undefined {
-	const notesSection = extractNotesSection(content);
-	if (!notesSection) return undefined;
-
-	const lines = notesSection.split('\n');
 	const habitLower = habitName.toLowerCase();
 
-	for (const line of lines) {
-		const match = line.match(OBSERVATION_REGEX);
-		if (match?.[1] && match[1].trim().toLowerCase() === habitLower) {
-			return match[2]?.trim();
+	// Helper to find observation in a section
+	const findInSection = (section: string | undefined): string | undefined => {
+		if (!section) return undefined;
+		for (const line of section.split('\n')) {
+			const match = line.match(OBSERVATION_REGEX);
+			if (match?.[1]?.trim().toLowerCase() === habitLower) {
+				return match[2]?.trim();
+			}
 		}
-	}
+		return undefined;
+	};
 
-	return undefined;
+	// Check both sections and merge
+	const fromIntro = findInSection(extractIntroSection(content));
+	const fromNotes = findInSection(extractNotesSection(content));
+
+	if (fromIntro && fromNotes) {
+		return `${fromIntro} | ${fromNotes}`;
+	}
+	return fromIntro ?? fromNotes;
 }
 
 /**

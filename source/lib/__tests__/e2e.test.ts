@@ -470,3 +470,117 @@ test('e2e: CLI --log rejects invalid --date', t => {
 
 	t.truthy(error);
 });
+
+// Test CLI --history shows habit timeline
+test('e2e: CLI --history shows habit timeline with observations', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const output = execSync(
+		`node ${cliPath} --history "Drink whiskey" --weeks 5 --reference-date 1989-04-06`,
+		{
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			timeout: 10000,
+		},
+	);
+
+	// Should show habit name and emoji (capitalized)
+	t.true(output.includes('🥃'), 'Should show drink whiskey emoji');
+	t.true(output.includes('Drink Whiskey'), 'Should show habit name capitalized');
+
+	// Should show timeline header
+	t.true(output.includes('Last'), 'Should show "Last X days" header');
+
+	// Should show schedule info with all days
+	t.true(output.includes('Schedule'), 'Should show schedule info');
+	// All days should be present in schedule display
+	t.true(output.includes('Mon'), 'Should show Mon in schedule');
+
+	// Should show heatmap characters
+	const heatmapChars = ['░', '▒', '▓', '█'];
+	const hasHeatmapChars = heatmapChars.some(char => output.includes(char));
+	t.true(hasHeatmapChars, 'Should display heatmap characters');
+
+	// Should show dates in YYYY-MM-DD format
+	t.true(output.includes('1989-'), 'Should show dates from 1989');
+});
+
+// Test CLI --history shows observations from Notes section
+test('e2e: CLI --history includes observations', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const output = execSync(
+		`node ${cliPath} --history "Drink whiskey" --weeks 5 --reference-date 1989-04-06`,
+		{
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			timeout: 10000,
+		},
+	);
+
+	// Should include some observations (at least one from the fixture)
+	// These are the possible observations for Drink whiskey
+	const possibleObservations = [
+		'Imported from Scotland',
+		'Celebrating the new single',
+		'Mixed with coconut water',
+	];
+
+	const hasObservation = possibleObservations.some(obs => output.includes(obs));
+	t.true(hasObservation, 'Should show at least one observation');
+});
+
+// Test CLI --history shows schedule and start-date for configured habits
+test('e2e: CLI --history shows schedule for Gym habit', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const output = execSync(
+		`node ${cliPath} --history "Gym" --weeks 5 --reference-date 1989-04-06`,
+		{
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			timeout: 10000,
+		},
+	);
+
+	// Should show gym emoji
+	t.true(output.includes('🏋'), 'Should show gym emoji');
+	// Should show schedule with all days (Mon / Tue / Wed / Thu / Fri / Sat / Sun)
+	t.true(output.includes('Schedule:'), 'Should show schedule label');
+	t.true(output.includes('Mon'), 'Should show Mon in schedule');
+	t.true(output.includes('Fri'), 'Should show Fri in schedule');
+});
+
+// Test CLI --history shows start-date for Call manager habit
+test('e2e: CLI --history shows start-date', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const output = execSync(
+		`node ${cliPath} --history "Call manager" --weeks 5 --reference-date 1989-04-06`,
+		{
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			timeout: 10000,
+		},
+	);
+
+	// Should show start date
+	t.true(output.includes('📞'), 'Should show call manager emoji');
+	t.true(output.includes('Started'), 'Should show "Started" label');
+	t.true(output.includes('1989-03-20'), 'Should show start date');
+});
+
+// Test CLI --history rejects unknown habit
+test('e2e: CLI --history rejects unknown habit', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const error = t.throws(() => {
+		execSync(`node ${cliPath} --history "Unknown habit"`, {
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			stdio: 'pipe',
+		});
+	});
+
+	t.truthy(error);
+});
