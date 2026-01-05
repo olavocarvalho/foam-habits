@@ -217,7 +217,7 @@ foam-habits --history "Drink water" --weeks 8
 
 ```
 💪 Gym - Last 28 days
-  Schedule: Mon / Tue / Wed / Thu / Fri / Sat / Sun  |  Started: 2025-01-01
+  Schedule: [Mon] / Tue / [Wed] / Thu / [Fri] / Sat / Sun  |  Started: 2025-01-01
 
 2025-01-05  █  Train A - chest and triceps
 2025-01-04  ░
@@ -229,7 +229,7 @@ foam-habits --history "Drink water" --weeks 8
 The history view shows:
 - **Completion status**: Same symbols as heatmap (░▒▓█)
 - **Observations**: From intro area and `## Notes` sections (merged with ` | ` if both exist)
-- **Schedule**: All 7 days shown, with scheduled days highlighted
+- **Schedule**: All 7 days shown, scheduled days highlighted (shown in `[brackets]` above, purple in terminal)
 - **Start date**: When tracking began (if configured)
 
 ### Options
