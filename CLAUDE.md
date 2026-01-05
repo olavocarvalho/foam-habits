@@ -28,9 +28,11 @@ foam-habits/
 │   │
 │   ├── components/
 │   │   ├── Cell.tsx         # Single heatmap cell (░▒▓█)
+│   │   ├── ConfigPrompt.tsx # Config creation prompt
 │   │   ├── HabitRow.tsx     # Habit row: emoji + name + cells + streak
 │   │   ├── Header.tsx       # Title + date column headers
 │   │   ├── Heatmap.tsx      # Main grid container
+│   │   ├── HistoryView.tsx  # Single habit timeline view
 │   │   └── Warnings.tsx     # Static warnings display
 │   │
 │   ├── hooks/
@@ -95,12 +97,12 @@ Aggregates habit data:
 - `aggregateHabits()` - combine entries into HabitData for rendering
 - `getCompletionLevel()` - calculate 0-3 completion level for cells
 
-### `source/components/Cell.tsx`
-Renders completion symbols with colors:
-- `░` (dim) - not done
-- `▒` (red) - low progress
-- `▓` (yellow) - partial progress
-- `█` (green) - complete
+### `source/lib/theme.ts`
+Shared visual constants:
+- `PALETTE` - color hex values (title, red, yellow, green, dimmed)
+- `CompletionLevel` - type `0 | 1 | 2 | 3`
+- `SYMBOLS` - completion symbols: `░▒▓█`
+- `LEVEL_COLORS` - color per completion level
 
 ## Tech Stack
 
@@ -138,14 +140,18 @@ habits:
 ## CLI Usage
 
 ```bash
-foam-habits                  # Last 4 weeks
-foam-habits --weeks 12       # Last 12 weeks
-foam-habits --current-month  # Current month only
+foam-habits                        # Last 4 weeks
+foam-habits --weeks 12             # Last 12 weeks
+foam-habits --current-month        # Current month only
+foam-habits --history gym          # View single habit timeline
+foam-habits --log "Gym"            # Log habit to today's note
+foam-habits --log "Water: 2L" -d 2026-01-01  # Log with date
+foam-habits --reference-date 2026-01-01      # View from specific date (testing)
 ```
 
 ## Testing
 
-85 tests using ava:
+139 tests using ava:
 ```bash
 npm test
 ```
@@ -165,6 +171,7 @@ Tests cover:
 1. Create in `source/components/`
 2. Use Ink's `Box` and `Text` components
 3. Import theme constants from `lib/theme.ts`
+4. Avoid duplicating constants - shared values go in `theme.ts`
 
 ### Adding a new CLI option
 1. Add flag in `source/cli.tsx` meow config
