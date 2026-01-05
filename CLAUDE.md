@@ -238,11 +238,15 @@ When releasing a new version:
 
 4. **Bump version and tag**:
    ```bash
-   npm version <major|minor|patch>  # Creates commit + tag
+   npm version <major|minor|patch>  # Runs preversion hook, creates commit + tag
    ```
    - **major**: Breaking changes
    - **minor**: New features (backward compatible)
    - **patch**: Bug fixes
+
+   The `preversion` hook automatically:
+   - Validates `package-lock.json` is in sync
+   - Runs all tests
 
 5. **Push to remote**:
    ```bash

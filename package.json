@@ -32,6 +32,8 @@
 		"dev": "tsc --watch",
 		"test": "tsc && ava",
 		"lint": "prettier --check . && xo",
+		"validate-lock": "npm install --package-lock-only && git diff --exit-code package-lock.json || (echo 'Error: package-lock.json is out of sync. Run npm install and commit.' && exit 1)",
+		"preversion": "npm run validate-lock && npm test",
 		"prepublishOnly": "npm run build && npm test"
 	},
 	"files": [
