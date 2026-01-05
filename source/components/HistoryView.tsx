@@ -1,5 +1,6 @@
 import React from 'react';
 import {Box, Text} from 'ink';
+import Legend from './Legend.js';
 import {
 	PALETTE,
 	SYMBOLS,
@@ -57,7 +58,7 @@ function ScheduleDisplay({schedule}: {schedule: Schedule}) {
 		<>
 			{ALL_DAYS.map((day, idx) => (
 				<React.Fragment key={day}>
-					<Text color={scheduledDays.has(day) ? PALETTE.title : PALETTE.dimmed}>
+					<Text color={scheduledDays.has(day) ? PALETTE.accentLight : PALETTE.dimmed}>
 						{day}
 					</Text>
 					{idx < ALL_DAYS.length - 1 && <Text dimColor> / </Text>}
@@ -123,7 +124,7 @@ export default function HistoryView({
 
 	return (
 		<Box flexDirection="column" paddingTop={1}>
-			<Text color={PALETTE.title}>
+			<Text color={PALETTE.accent}>
 				{emoji} {capitalizedName} - Last {weeks * 7} days
 			</Text>
 			<Box>
@@ -180,6 +181,7 @@ export default function HistoryView({
 					</Box>
 				);
 			})}
+			<Legend />
 		</Box>
 	);
 }

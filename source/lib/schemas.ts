@@ -57,10 +57,22 @@ export const HabitConfigSchema = z.object({
 	schedule: ScheduleSchema,
 });
 
+// Color configuration (all optional, defaults to theme.ts DEFAULT_PALETTE)
+export const ColorConfigSchema = z.object({
+	accent: z.string().optional(),
+	'accent-light': z.string().optional(),
+	complete: z.string().optional(),
+	partial: z.string().optional(),
+	low: z.string().optional(),
+	dimmed: z.string().optional(),
+});
+
 // Global config section in habits.yaml
 export const GlobalConfigSchema = z.object({
 	// Use checkbox format "- [x] Habit" when logging via CLI (default: false = "- Habit")
 	checkbox: z.boolean().default(false),
+	// Custom color palette (optional overrides)
+	colors: ColorConfigSchema.optional(),
 });
 
 // Full habits.yaml config
@@ -102,6 +114,7 @@ export const ViewArgsSchema = z.object({
 
 // Types inferred from schemas
 export type HabitConfig = z.infer<typeof HabitConfigSchema>;
+export type ColorConfig = z.infer<typeof ColorConfigSchema>;
 export type GlobalConfig = z.infer<typeof GlobalConfigSchema>;
 export type Config = z.infer<typeof ConfigSchema>;
 export type HabitEntry = z.infer<typeof HabitEntrySchema>;

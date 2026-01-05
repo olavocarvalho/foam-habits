@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {type HabitData, type ViewArgs} from '../lib/schemas.js';
-import {loadConfig, getRootDir} from '../lib/config.js';
+import {loadConfig, getRootDir, applyColorConfig} from '../lib/config.js';
 import {parseJournals} from '../lib/parser.js';
 import {aggregateHabits, getDateRange} from '../lib/tracker.js';
 
@@ -29,8 +29,9 @@ export function useHabitData(args: UseHabitDataArgs): UseHabitDataResult {
 		setError(undefined);
 
 		try {
-			// Load config
+			// Load config and apply color settings
 			const config = loadConfig();
+			applyColorConfig(config);
 			const rootDir = getRootDir();
 
 			// Parse journal files

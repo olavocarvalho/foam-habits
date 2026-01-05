@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
 import {ConfigSchema, type Config} from './schemas.js';
+import {setPalette, type PaletteColors} from './theme.js';
 
 export class ConfigError extends Error {
 	constructor(message: string) {
@@ -73,6 +74,28 @@ export function loadConfig(configPath?: string): Config {
 	}
 
 	return result.data;
+}
+
+/**
+ * Apply color configuration from user's habits.yaml to the palette
+ * Maps user-facing names (accent-light, complete, etc.) to internal names
+ */
+export function applyColorConfig(config: Config): void {
+	const colors = config.config?.colors;
+	if (!colors) return;
+
+	const paletteOverrides: Partial<PaletteColors> = {};
+
+	if (colors.accent) paletteOverrides.accent = colors.accent;
+	if (colors['accent-light']) paletteOverrides.accentLight = colors['accent-light'];
+	if (colors.complete) paletteOverrides.green = colors.complete;
+	if (colors.partial) paletteOverrides.yellow = colors.partial;
+	if (colors.low) paletteOverrides.red = colors.low;
+	if (colors.dimmed) paletteOverrides.dimmed = colors.dimmed;
+
+	if (Object.keys(paletteOverrides).length > 0) {
+		setPalette(paletteOverrides);
+	}
 }
 
 /**

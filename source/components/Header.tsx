@@ -76,7 +76,7 @@ export default function Header({dates, nameWidth, weeks, currentMonth}: Props) {
 		<Box flexDirection="column" marginBottom={1}>
 			{/* Title */}
 			<Box marginBottom={1}>
-				<Text bold color={PALETTE.title}>
+				<Text bold color={PALETTE.accent}>
 					Foam Habits
 				</Text>
 				<Text color={PALETTE.dimmed}>

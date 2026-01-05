@@ -57,7 +57,7 @@ export default function App({weeks, currentMonth, referenceDate}: Props) {
 	} else if (loading) {
 		content = (
 			<Box>
-				<Text color={PALETTE.title}>
+				<Text color={PALETTE.accent}>
 					<Spinner type="dots" />
 				</Text>
 				<Text> Scanning journal entries...</Text>

@@ -2,6 +2,7 @@ import React from 'react';
 import {Box} from 'ink';
 import Header from './Header.js';
 import HabitRow from './HabitRow.js';
+import Legend from './Legend.js';
 import {type HabitData} from '../lib/schemas.js';
 
 type Props = {
@@ -38,6 +39,7 @@ export default function Heatmap({habits, dates, weeks, currentMonth}: Props) {
 					nameWidth={nameWidth}
 				/>
 			))}
+			<Legend />
 		</Box>
 	);
 }

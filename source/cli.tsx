@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import {format} from 'date-fns';
 import App from './app.js';
 import HistoryView from './components/HistoryView.js';
-import {loadConfig, getRootDir, ConfigNotFoundError} from './lib/config.js';
+import {loadConfig, getRootDir, ConfigNotFoundError, applyColorConfig} from './lib/config.js';
 import {logHabit} from './lib/logger.js';
 import {loadHabitHistory} from './lib/parser.js';
 import {parseGoal, DEFAULT_EMOJI} from './lib/schemas.js';
@@ -125,6 +125,7 @@ if (cli.flags.log) {
 
 	try {
 		const config = loadConfig();
+		applyColorConfig(config);
 		const rootDir = getRootDir();
 		const result = logHabit(rootDir, cli.flags.log, logDate, config);
 
@@ -176,6 +177,7 @@ if (cli.flags.history || cli.flags['H']) {
 
 	try {
 		const config = loadConfig();
+		applyColorConfig(config);
 		const rootDir = getRootDir();
 
 		// Find habit in config (case-insensitive)

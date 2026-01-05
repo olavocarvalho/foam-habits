@@ -33,6 +33,7 @@ foam-habits/
 │   │   ├── Header.tsx       # Title + date column headers
 │   │   ├── Heatmap.tsx      # Main grid container
 │   │   ├── HistoryView.tsx  # Single habit timeline view
+│   │   ├── Legend.tsx       # Symbol legend footer
 │   │   └── Warnings.tsx     # Static warnings display
 │   │
 │   ├── hooks/

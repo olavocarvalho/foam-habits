@@ -61,6 +61,13 @@ Add a `config` section for global settings:
 ```yaml
 config:
   checkbox: true  # Use "- [x] Habit" format when logging
+  colors:
+    accent: cyan        # Titles, highlights (default: #9EA5FF purple)
+    accent-light: gray  # Subtitles, scheduled days (default: #AAB1EF)
+    complete: green     # Complete/well done (default: #6BC87B)
+    partial: yellow     # Partial progress (default: #C0B435)
+    low: red            # Low progress (default: #FC8897)
+    dimmed: gray        # Dimmed text (default: #717380)
 
 habits:
   Gym:
@@ -71,6 +78,7 @@ habits:
 | Option     | Type    | Default | Description                                          |
 | ---------- | ------- | ------- | ---------------------------------------------------- |
 | `checkbox` | boolean | `false` | Use checkbox format `- [x] Habit` when logging via CLI |
+| `colors`   | object  | -       | Custom color palette (see example above)             |
 
 ### Advanced Configuration Example
 
@@ -245,6 +253,12 @@ The history view shows:
 
 ## Heatmap Legend
 
+A legend is automatically displayed as a footer in both heatmap and history views:
+
+```
+░ not done  ▒ low  ▓ partial  █ well done
+```
+
 | Symbol | Color  | Meaning                                |
 | ------ | ------ | -------------------------------------- |
 | `░`    | dim    | Not done                               |
@@ -281,24 +295,7 @@ npm run dev     # Watch mode
 
 - [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
 
-- [ ] **Legend component**: Add a footer legend to heatmap and history views explaining the symbols:
-  ```
-  ░ not done  ▒ low  ▓ partial  █ well done
-  ```
-
 - [ ] **Normalize component naming**: Rename `Heatmap.tsx` → `HeatmapView.tsx` for consistency with `HistoryView.tsx`
-
-- [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
-  ```yaml
-  config:
-    colors:
-      accent: cyan        # Titles, scheduled days, highlights (default: purple)
-      accent-light: gray  # Subtitles, secondary text (default: dimmed purple)
-      complete: green
-      partial: yellow
-      low: red
-  ```
-  Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
 
 ## License
 

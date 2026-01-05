@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.0] - 2026-01-05
+
+### Added
+- **Configurable color palette**: Customize colors in `habits.yaml` config section
+- **Legend component**: Footer legend showing symbol meanings in heatmap and history views
+- `accent-light` color (#AAB1EF) for scheduled days and subtitles
+
+### Changed
+- Renamed `PALETTE.title` → `PALETTE.accent` throughout codebase
+- Schedule days now use `accentLight` color instead of `accent`
+- `theme.ts` now exports `PaletteColors` type and `setPalette()` function
+
 ## [1.6.2] - 2026-01-05
 
 ### Changed
