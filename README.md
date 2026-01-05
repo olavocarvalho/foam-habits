@@ -284,10 +284,11 @@ npm run dev     # Watch mode
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
   config:
-    complete: green
-    partial: yellow
-    low: red
-    title: cyan
+    colors:
+      accent: cyan      # Titles, scheduled days, highlights (default: purple)
+      complete: green
+      partial: yellow
+      low: red
   ```
   Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
 
