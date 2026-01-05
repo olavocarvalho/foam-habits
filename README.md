@@ -144,6 +144,8 @@ npm run dev     # Watch mode
 
 ## Roadmap
 
+### Next
+
 - [ ] **Habit start date**: Differentiate between days when a habit wasn't tracked yet vs days when it was skipped. Add optional `start-date` config:
   ```yaml
   habits:
@@ -152,6 +154,28 @@ npm run dev     # Watch mode
       start-date: 2025-01-01 # Days before this show as " " instead of "░"
   ```
   This prevents old days from appearing as "missed" when you add a new habit.
+
+- [ ] **Weekly schedule per habit**: Define which days of the week each habit applies. Non-scheduled days show as blank instead of missed:
+  ```yaml
+  habits:
+    Gym:
+      emoji: 💪
+      schedule: [mon, wed, fri]    # Custom days
+
+    Meditation:
+      emoji: 🧘
+      schedule: weekdays           # Mon-Fri shortcut
+
+    Family time:
+      emoji: 👨‍👩‍👧
+      schedule: weekends           # Sat-Sun shortcut
+  ```
+  - `daily` = all days (default, current behavior)
+  - `weekdays` = Monday through Friday
+  - `weekends` = Saturday and Sunday
+  - `[mon, tue, wed, thu, fri, sat, sun]` = custom array
+
+  Streaks skip non-scheduled days (e.g., Mon-Wed-Fri consistency = unbroken streak).
 
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
@@ -162,6 +186,29 @@ npm run dev     # Watch mode
     title: cyan
   ```
   Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
+
+- [ ] **Strip emojis from journal entries**: When parsing daily notes, strip emojis from habit names before matching against `habits.yaml`. This allows using emojis in journal entries for a nicer writing experience:
+  ```markdown
+  ## Habits
+  - 💪 Gym
+  - 💧 Drink water: 3.5L
+  ```
+  Would match `Gym` and `Drink water` in the config. The emoji in the config remains the source of truth for display.
+
+- [ ] **Markdown checkbox support**: Support optional markdown checkboxes in habit entries. This allows habits to be used as a checklist in your daily note:
+  ```markdown
+  ## Habits
+  - [x] Gym
+  - [ ] Meditation
+  - [x] Drink water: 3.5L
+  ```
+  - `- [x]` or `- [X]` = habit done (boolean) or value logged (quantitative)
+  - `- [ ]` = habit explicitly not done (skip for the day)
+  - `- Habit` = current behavior, presence means done
+
+  Both styles should work, allowing users to choose their preferred journaling format.
+
+### Later
 
 - [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
 

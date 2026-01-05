@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.3.0] - 2026-01-05
+
+### Added
+- Strip leading emojis from journal entries (`- 💪 Gym` now matches `Gym` in config)
+- Markdown checkbox support (`- [x] Gym` = done, `- [ ] Gym` = skipped)
+- `start-date` config option to define when a habit tracking begins (days before show as blank)
+- `schedule` config option for weekly schedules: `daily`, `weekdays`, `weekends`, or custom days like `['mon', 'wed', 'fri']`
+
+### Changed
+- Tim Maia fixture now demonstrates all new features with 6 habits
+
 ## [1.1.1] - 2026-01-01
 
 ### Fixed

@@ -8,10 +8,10 @@ import type {Config} from '../schemas.js';
 
 const mockConfig: Config = {
 	habits: {
-		Gym: {emoji: '💪', threshold: 1.0},
-		'Drink water': {emoji: '💧', goal: '4L', threshold: 1.0},
-		Study: {emoji: '📖', goal: '30min', threshold: 1.0},
-		Meditation: {emoji: '🧘', threshold: 1.0},
+		Gym: {emoji: '💪', threshold: 1.0, schedule: 'daily'},
+		'Drink water': {emoji: '💧', goal: '4L', threshold: 1.0, schedule: 'daily'},
+		Study: {emoji: '📖', goal: '30min', threshold: 1.0, schedule: 'daily'},
+		Meditation: {emoji: '🧘', threshold: 1.0, schedule: 'daily'},
 	},
 };
 
@@ -256,4 +256,134 @@ foam_template:
 ---`;
 
 	t.is(parseFolderFromTemplate(content), undefined);
+});
+
+// Emoji stripping tests
+test('parseHabitEntries: strips leading emoji from boolean habit', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- 💪 Gym',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'gym');
+	t.is(entries[0]!.value, 1);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: strips leading emoji from quantitative habit', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- 💧 Drink water: 3.5L',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'drink water');
+	t.is(entries[0]!.value, 3.5);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: handles multiple emojis before habit name', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- 🧘‍♀️ 🙏 Meditation',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'meditation');
+	t.is(warnings.length, 0);
+});
+
+// Checkbox support tests
+test('parseHabitEntries: handles checked checkbox [x]', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- [x] Gym',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'gym');
+	t.is(entries[0]!.value, 1);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: handles uppercase checked checkbox [X]', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- [X] Gym',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'gym');
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: skips unchecked checkbox [ ]', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- [ ] Gym',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 0);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: checkbox with value uses the value', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- [x] Drink water: 3.5L',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'drink water');
+	t.is(entries[0]!.value, 3.5);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: mixed checkboxes and regular entries', t => {
+	const section = `- [x] Gym
+- [ ] Study
+- Meditation
+- [X] Drink water: 4L`;
+
+	const {entries, warnings} = parseHabitEntries(
+		section,
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 3); // Study skipped because unchecked
+	t.is(entries[0]!.name, 'gym');
+	t.is(entries[1]!.name, 'meditation');
+	t.is(entries[2]!.name, 'drink water');
+	t.is(entries[2]!.value, 4);
+	t.is(warnings.length, 0);
+});
+
+test('parseHabitEntries: checkbox with emoji strips emoji', t => {
+	const {entries, warnings} = parseHabitEntries(
+		'- [x] 💪 Gym',
+		'2025-01-01',
+		mockConfig,
+		'2025-01-01.md',
+	);
+
+	t.is(entries.length, 1);
+	t.is(entries[0]!.name, 'gym');
+	t.is(warnings.length, 0);
 });

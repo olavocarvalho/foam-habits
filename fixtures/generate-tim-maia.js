@@ -11,6 +11,14 @@
  * - Smoke joints (goal: 4, threshold: 0.75) - varies 1-5
  * - Drink whiskey (goal: 1L) - 0.2-1.5L daily
  * - Skip rehearsal (boolean) - ~45% completion
+ * - Call manager (boolean, start-date: 1989-03-20) - ~60% completion
+ * - Gym (boolean, weekdays schedule) - ~70% completion
+ *
+ * New features demonstrated:
+ * - Emoji prefixes in ~30% of entries (e.g., "💪 Wake up late")
+ * - Checkbox format in ~20% of entries (e.g., "- [x] Gym")
+ * - start-date config (Call manager starts mid-fixture)
+ * - schedule config (Gym is weekdays only)
  *
  * Usage:
  *   node fixtures/generate-tim-maia.js
@@ -18,8 +26,12 @@
  * To regenerate with different random data, just run again.
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const baseDir = path.join(__dirname, 'tim-maia');
 const journalDir = path.join(baseDir, 'journal');
@@ -30,7 +42,7 @@ const templatesDir = path.join(foamDir, 'templates');
 fs.mkdirSync(journalDir, {recursive: true});
 fs.mkdirSync(templatesDir, {recursive: true});
 
-// Create habits.yaml
+// Create habits.yaml with new features
 const habitsYaml = `habits:
   Wake up late:
     emoji: "😴"
@@ -46,6 +58,14 @@ const habitsYaml = `habits:
 
   Skip rehearsal:
     emoji: "🎤"
+
+  Call manager:
+    emoji: "📞"
+    start-date: "1989-03-20"
+
+  Gym:
+    emoji: "🏋️"
+    schedule: weekdays
 `;
 
 fs.writeFileSync(path.join(foamDir, 'habits.yaml'), habitsYaml);
@@ -90,6 +110,46 @@ const funNotes = [
 ];
 
 /**
+ * Format entry with optional emoji prefix and checkbox format
+ * @param {string} habitName - The habit name
+ * @param {string} emoji - The emoji to optionally prefix
+ * @param {string|number} value - Optional value for quantitative habits
+ */
+function formatEntry(habitName, emoji, value = null) {
+	const useEmoji = Math.random() < 0.3; // 30% chance of emoji prefix
+	const useCheckbox = Math.random() < 0.2; // 20% chance of checkbox format
+
+	let entry = habitName;
+	if (value !== null) {
+		entry = `${habitName}: ${value}`;
+	}
+
+	if (useEmoji) {
+		entry = `${emoji} ${entry}`;
+	}
+
+	if (useCheckbox) {
+		return `- [x] ${entry}`;
+	}
+	return `- ${entry}`;
+}
+
+/**
+ * Get day of week (0=Sun, 1=Mon, ..., 6=Sat)
+ */
+function getDayOfWeek(dateStr) {
+	return new Date(dateStr).getDay();
+}
+
+/**
+ * Check if date is a weekday (Mon-Fri)
+ */
+function isWeekday(dateStr) {
+	const day = getDayOfWeek(dateStr);
+	return day >= 1 && day <= 5;
+}
+
+/**
  * Generate a single day's journal content
  */
 function generateDay(date) {
@@ -97,25 +157,35 @@ function generateDay(date) {
 
 	// Wake up late - ~85% of the time
 	if (Math.random() < 0.85) {
-		habits.push('- Wake up late');
+		habits.push(formatEntry('Wake up late', '😴'));
 	}
 
 	// Smoke joints - varies from 0-6, usually 1-5
 	const joints = Math.random() < 0.9 ? Math.floor(Math.random() * 5) + 1 : 0;
 	if (joints > 0) {
-		habits.push(`- Smoke joints: ${joints}`);
+		habits.push(formatEntry('Smoke joints', '🌿', joints));
 	}
 
 	// Drink whiskey - varies, sometimes heavy, sometimes light
 	const whiskey =
 		Math.random() < 0.85 ? (Math.random() * 1.3 + 0.2).toFixed(1) : 0;
 	if (whiskey > 0) {
-		habits.push(`- Drink whiskey: ${whiskey}L`);
+		habits.push(formatEntry('Drink whiskey', '🥃', `${whiskey}L`));
 	}
 
 	// Skip rehearsal - ~45% of days
 	if (Math.random() < 0.45) {
-		habits.push('- Skip rehearsal');
+		habits.push(formatEntry('Skip rehearsal', '🎤'));
+	}
+
+	// Call manager - ~60% of days, only after 1989-03-20 (start-date)
+	if (date >= '1989-03-20' && Math.random() < 0.6) {
+		habits.push(formatEntry('Call manager', '📞'));
+	}
+
+	// Gym - ~70% of weekdays only (schedule: weekdays)
+	if (isWeekday(date) && Math.random() < 0.7) {
+		habits.push(formatEntry('Gym', '🏋️'));
 	}
 
 	const note = funNotes[Math.floor(Math.random() * funNotes.length)];

@@ -18,22 +18,30 @@ const REFERENCE_DATE = new Date(1989, 3, 6); // Month is 0-indexed (3 = April)
 test('e2e: loads Tim Maia habits config', t => {
 	const config = loadConfig(CONFIG_PATH);
 
-	t.is(Object.keys(config.habits).length, 4);
+	t.is(Object.keys(config.habits).length, 6);
 	t.truthy(config.habits['Wake up late']);
 	t.truthy(config.habits['Smoke joints']);
 	t.truthy(config.habits['Drink whiskey']);
 	t.truthy(config.habits['Skip rehearsal']);
+	t.truthy(config.habits['Call manager']);
+	t.truthy(config.habits['Gym']);
 
 	// Check emojis
 	t.is(config.habits['Wake up late']?.emoji, '😴');
 	t.is(config.habits['Smoke joints']?.emoji, '🌿');
 	t.is(config.habits['Drink whiskey']?.emoji, '🥃');
 	t.is(config.habits['Skip rehearsal']?.emoji, '🎤');
+	t.is(config.habits['Call manager']?.emoji, '📞');
+	t.is(config.habits['Gym']?.emoji, '🏋️');
 
 	// Check quantitative goals
 	t.is(config.habits['Smoke joints']?.goal, '4');
 	t.is(config.habits['Smoke joints']?.threshold, 0.75);
 	t.is(config.habits['Drink whiskey']?.goal, '1L');
+
+	// Check new features: start-date and schedule
+	t.is(config.habits['Call manager']?.['start-date'], '1989-03-20');
+	t.is(config.habits['Gym']?.schedule, 'weekdays');
 });
 
 // Test getRootDir
@@ -69,6 +77,8 @@ test('e2e: parses all 34 Tim Maia journal entries', t => {
 		'smoke joints',
 		'drink whiskey',
 		'skip rehearsal',
+		'call manager',
+		'gym',
 	];
 	for (const name of habitNames) {
 		t.true(possibleHabits.includes(name), `Unknown habit: ${name}`);
@@ -87,24 +97,30 @@ test('e2e: aggregates Tim Maia habit data correctly', t => {
 	const dateRange = getDateRange({weeks: 6, currentMonth: false}, REFERENCE_DATE);
 	const habits = aggregateHabits(entries, config, dateRange, REFERENCE_DATE);
 
-	t.is(habits.length, 4, 'Should have 4 habits');
+	t.is(habits.length, 6, 'Should have 6 habits');
 
 	// Find each habit (names use original case from config)
 	const wakeUp = habits.find(h => h.name === 'Wake up late');
 	const joints = habits.find(h => h.name === 'Smoke joints');
 	const whiskey = habits.find(h => h.name === 'Drink whiskey');
 	const rehearsal = habits.find(h => h.name === 'Skip rehearsal');
+	const callManager = habits.find(h => h.name === 'Call manager');
+	const gym = habits.find(h => h.name === 'Gym');
 
 	t.truthy(wakeUp);
 	t.truthy(joints);
 	t.truthy(whiskey);
 	t.truthy(rehearsal);
+	t.truthy(callManager);
+	t.truthy(gym);
 
 	// Check emoji mapping
 	t.is(wakeUp?.emoji, '😴');
 	t.is(joints?.emoji, '🌿');
 	t.is(whiskey?.emoji, '🥃');
 	t.is(rehearsal?.emoji, '🎤');
+	t.is(callManager?.emoji, '📞');
+	t.is(gym?.emoji, '🏋️');
 
 	// Check goals are parsed
 	t.is(joints?.goal, 4);
@@ -115,6 +131,10 @@ test('e2e: aggregates Tim Maia habit data correctly', t => {
 	// Boolean habits should not have goals
 	t.is(wakeUp?.goal, undefined);
 	t.is(rehearsal?.goal, undefined);
+
+	// Check new features: start-date and schedule
+	t.is(callManager?.startDate, '1989-03-20');
+	t.is(gym?.schedule, 'weekdays');
 });
 
 // Test quantitative habit values
@@ -200,13 +220,16 @@ test('e2e: CLI runs with --reference-date for Tim Maia fixture', t => {
 		},
 	);
 
-	// Should contain habit emojis
+	// Should contain habit emojis (including new ones)
 	t.true(output.includes('😴'), 'Should show wake up emoji');
 	t.true(output.includes('🌿'), 'Should show smoke joints emoji');
 	t.true(output.includes('🥃'), 'Should show drink whiskey emoji');
 	t.true(output.includes('🎤'), 'Should show skip rehearsal emoji');
+	t.true(output.includes('📞'), 'Should show call manager emoji');
+	t.true(output.includes('🏋'), 'Should show gym emoji');
 
 	// Should contain heatmap characters (at least some activity)
+	// Note: ' ' (blank) is now also possible for before start-date or unscheduled days
 	const heatmapChars = ['░', '▒', '▓', '█'];
 	const hasHeatmapChars = heatmapChars.some(char => output.includes(char));
 	t.true(hasHeatmapChars, 'Should display heatmap characters');

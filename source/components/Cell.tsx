@@ -5,7 +5,7 @@ import {PALETTE} from '../lib/palette.js';
 type CompletionLevel = 0 | 1 | 2 | 3;
 
 type Props = {
-	level: CompletionLevel;
+	level: CompletionLevel | null;
 };
 
 const SYMBOLS: Record<CompletionLevel, string> = {
@@ -23,6 +23,11 @@ const COLORS: Record<CompletionLevel, string> = {
 };
 
 export default function Cell({level}: Props) {
+	// null = before start date, render as blank space
+	if (level === null) {
+		return <Text> </Text>;
+	}
+
 	const color = COLORS[level];
 
 	return <Text color={color}>{SYMBOLS[level]}</Text>;

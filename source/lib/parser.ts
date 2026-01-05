@@ -13,6 +13,15 @@ const DATE_REGEX = /^(\d{4}-\d{2}-\d{2})\.md$/;
 // Regex to extract value from habit entry (e.g., "Water: 2.5L" -> 2.5)
 const VALUE_REGEX = /:\s*([\d.]+)/;
 
+// Regex to match list items with optional checkbox (e.g., "- [x] Gym" or "- Gym")
+// Group 1: checkbox state (x, X, or space) - optional
+// Group 2: the actual content
+const LIST_ITEM_REGEX = /^[-*]\s+(?:\[([xX\s])\]\s*)?(.+)$/;
+
+// Regex to strip leading emojis from habit entries
+// Matches emoji presentation sequences, extended pictographics, ZWJ sequences, and whitespace
+const LEADING_EMOJI_REGEX = /^(?:[\p{Emoji_Presentation}\p{Extended_Pictographic}]|\u200D|\uFE0F|\s)+/u;
+
 // Default folder if template doesn't exist or can't be parsed
 const DEFAULT_JOURNAL_FOLDER = 'journal';
 
@@ -138,14 +147,31 @@ export function parseHabitEntries(
 	const lines = habitsSection.split('\n');
 
 	for (const line of lines) {
-		// Match lines starting with "- " (list items)
-		const match = line.match(/^[-*]\s+(.+)$/);
-		if (!match?.[1]) continue;
+		// Match lines starting with "- " or "* " (list items), with optional checkbox
+		const match = line.match(LIST_ITEM_REGEX);
+		if (!match?.[2]) continue;
 
-		const rawEntry = match[1].trim();
+		const checkboxState = match[1]; // undefined, 'x', 'X', or ' '
+		let rawEntry = match[2].trim();
+
+		// Skip unchecked checkboxes (same as absent entry)
+		if (checkboxState === ' ') {
+			continue;
+		}
+
 		if (!rawEntry) {
 			warnings.push(
 				`⚠ Malformed entry in ${path.basename(filePath)}: "${line}"`,
+			);
+			continue;
+		}
+
+		// Strip leading emojis from the entry
+		rawEntry = rawEntry.replace(LEADING_EMOJI_REGEX, '').trim();
+
+		if (!rawEntry) {
+			warnings.push(
+				`⚠ Entry contains only emojis in ${path.basename(filePath)}: "${line}"`,
 			);
 			continue;
 		}

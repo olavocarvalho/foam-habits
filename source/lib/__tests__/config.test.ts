@@ -59,7 +59,7 @@ test('loadConfig: loads valid config successfully', t => {
 	const config = loadConfig(configPath);
 
 	t.truthy(config.habits);
-	t.is(Object.keys(config.habits).length, 4);
+	t.is(Object.keys(config.habits).length, 6);
 });
 
 // Test createDefaultConfig

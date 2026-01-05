@@ -13,3 +13,11 @@ habits:
 
   Skip rehearsal:
     emoji: "🎤"
+
+  Call manager:
+    emoji: "📞"
+    start-date: "1989-03-20"
+
+  Gym:
+    emoji: "🏋️"
+    schedule: weekdays

@@ -1,5 +1,5 @@
 import test from 'ava';
-import {parseGoal} from '../schemas.js';
+import {parseGoal, HabitConfigSchema, ScheduleSchema} from '../schemas.js';
 
 // parseGoal - basic cases
 test('parseGoal: parses integer with unit', t => {
@@ -55,4 +55,93 @@ test('parseGoal: throws on empty string', t => {
 	t.throws(() => parseGoal(''), {
 		message: /Invalid goal format/,
 	});
+});
+
+// HabitConfigSchema - start-date validation
+test('HabitConfigSchema: accepts valid start-date', t => {
+	const result = HabitConfigSchema.safeParse({
+		emoji: '💪',
+		'start-date': '2025-01-15',
+	});
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data['start-date'], '2025-01-15');
+	}
+});
+
+test('HabitConfigSchema: accepts habit without start-date', t => {
+	const result = HabitConfigSchema.safeParse({
+		emoji: '💪',
+	});
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data['start-date'], undefined);
+	}
+});
+
+test('HabitConfigSchema: rejects invalid start-date format', t => {
+	const result = HabitConfigSchema.safeParse({
+		emoji: '💪',
+		'start-date': '01-15-2025', // Wrong format
+	});
+	t.false(result.success);
+});
+
+test('HabitConfigSchema: rejects invalid start-date (not a date)', t => {
+	const result = HabitConfigSchema.safeParse({
+		emoji: '💪',
+		'start-date': 'not-a-date',
+	});
+	t.false(result.success);
+});
+
+// ScheduleSchema tests
+test('ScheduleSchema: accepts daily', t => {
+	const result = ScheduleSchema.safeParse('daily');
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data, 'daily');
+	}
+});
+
+test('ScheduleSchema: accepts weekdays', t => {
+	const result = ScheduleSchema.safeParse('weekdays');
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data, 'weekdays');
+	}
+});
+
+test('ScheduleSchema: accepts weekends', t => {
+	const result = ScheduleSchema.safeParse('weekends');
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data, 'weekends');
+	}
+});
+
+test('ScheduleSchema: accepts day array', t => {
+	const result = ScheduleSchema.safeParse(['mon', 'wed', 'fri']);
+	t.true(result.success);
+	if (result.success) {
+		t.deepEqual(result.data, ['mon', 'wed', 'fri']);
+	}
+});
+
+test('ScheduleSchema: defaults to daily', t => {
+	const result = ScheduleSchema.safeParse(undefined);
+	t.true(result.success);
+	if (result.success) {
+		t.is(result.data, 'daily');
+	}
+});
+
+test('ScheduleSchema: rejects invalid day name', t => {
+	const result = ScheduleSchema.safeParse(['monday']); // Should be 'mon'
+	t.false(result.success);
+});
+
+test('ScheduleSchema: rejects invalid schedule string', t => {
+	const result = ScheduleSchema.safeParse('monthly');
+	t.false(result.success);
 });
