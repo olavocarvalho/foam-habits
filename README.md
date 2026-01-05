@@ -281,6 +281,11 @@ npm run dev     # Watch mode
 
 - [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
 
+- [ ] **Legend component**: Add a footer legend to heatmap and history views explaining the symbols:
+  ```
+  ░ not done  ▒ low  ▓ partial  █ complete
+  ```
+
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
   config:
