@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.0] - 2026-01-05
+
+### Added
+- `--history <habit>` / `-H` flag to view habit timeline with observations
+- Habit observations in Notes section: `- **Habit:** observation text`
+- History view shows schedule and start date (if configured)
+- 9 new tests for observation parsing
+
 ## [1.5.0] - 2026-01-05
 
 ### Added

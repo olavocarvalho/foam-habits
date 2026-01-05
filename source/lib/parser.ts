@@ -22,6 +22,10 @@ const LIST_ITEM_REGEX = /^[-*]\s+(?:\[([xX\s])\]\s*)?(.+)$/;
 // Matches emoji presentation sequences, extended pictographics, ZWJ sequences, and whitespace
 const LEADING_EMOJI_REGEX = /^(?:[\p{Emoji_Presentation}\p{Extended_Pictographic}]|\u200D|\uFE0F|\s)+/u;
 
+// Regex to match observation entries in Notes section: - **HabitName:** observation text
+// The colon is INSIDE the bold: **Gym:** not **Gym**:
+const OBSERVATION_REGEX = /^[-*]\s+\*\*([^*:]+):\*\*\s*(.+)$/;
+
 // Default folder if template doesn't exist or can't be parsed
 const DEFAULT_JOURNAL_FOLDER = 'journal';
 
@@ -127,6 +131,58 @@ export function extractHabitsSection(content: string): string | undefined {
 	}
 
 	return habitsLines.length > 0 ? habitsLines.join('\n') : undefined;
+}
+
+/**
+ * Extract the ## Notes section from a markdown file
+ */
+export function extractNotesSection(content: string): string | undefined {
+	const lines = content.split('\n');
+	let inNotesSection = false;
+	const notesLines: string[] = [];
+
+	for (const line of lines) {
+		// Check for ## Notes header (case-insensitive)
+		if (/^##\s+notes?\s*$/i.test(line)) {
+			inNotesSection = true;
+			continue;
+		}
+
+		// Stop at next section header
+		if (inNotesSection && /^##\s+/.test(line)) {
+			break;
+		}
+
+		if (inNotesSection) {
+			notesLines.push(line);
+		}
+	}
+
+	return notesLines.length > 0 ? notesLines.join('\n') : undefined;
+}
+
+/**
+ * Extract observation for a specific habit from the Notes section
+ * Looks for pattern: - **HabitName:** observation text
+ */
+export function extractObservation(
+	content: string,
+	habitName: string,
+): string | undefined {
+	const notesSection = extractNotesSection(content);
+	if (!notesSection) return undefined;
+
+	const lines = notesSection.split('\n');
+	const habitLower = habitName.toLowerCase();
+
+	for (const line of lines) {
+		const match = line.match(OBSERVATION_REGEX);
+		if (match?.[1] && match[1].trim().toLowerCase() === habitLower) {
+			return match[2]?.trim();
+		}
+	}
+
+	return undefined;
 }
 
 /**
@@ -252,4 +308,56 @@ export function parseJournals(rootDir: string, config: Config): ParseResult {
 		entries: allEntries,
 		warnings: allWarnings,
 	};
+}
+
+export type HistoryEntry = {
+	date: string;
+	value: number | undefined;
+	observation: string | undefined;
+};
+
+/**
+ * Load habit history with observations for a specific habit
+ * Returns entries in reverse chronological order (newest first)
+ */
+export function loadHabitHistory(
+	rootDir: string,
+	habitName: string,
+	config: Config,
+): HistoryEntry[] {
+	const files = findJournalFiles(rootDir);
+	const entries: HistoryEntry[] = [];
+	const habitLower = habitName.toLowerCase();
+
+	for (const file of files) {
+		const filename = path.basename(file);
+		const dateMatch = filename.match(DATE_REGEX);
+		if (!dateMatch?.[1]) continue;
+
+		const date = dateMatch[1];
+		const content = fs.readFileSync(file, 'utf8');
+
+		// Get habit value from Habits section
+		const habitsSection = extractHabitsSection(content);
+		let value: number | undefined;
+
+		if (habitsSection) {
+			const {entries: habitEntries} = parseHabitEntries(
+				habitsSection,
+				date,
+				config,
+				file,
+			);
+			const entry = habitEntries.find(e => e.name === habitLower);
+			value = entry?.value;
+		}
+
+		// Get observation from Notes section
+		const observation = extractObservation(content, habitName);
+
+		entries.push({date, value, observation});
+	}
+
+	// Sort by date descending (newest first)
+	return entries.sort((a, b) => b.date.localeCompare(a.date));
 }

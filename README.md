@@ -109,6 +109,9 @@ In your daily notes (`journal/YYYY-MM-DD.md`), add a `## Habits` section:
 
 ## Notes
 
+- **Gym:** Train A - chest and triceps
+- **Drink water:** Need to cut back on soda
+
 Today was productive...
 ```
 
@@ -135,6 +138,19 @@ You can also use emojis and checkboxes in your journal entries:
 - **Emoji prefix**: Leading emojis are stripped before matching against config
 - **Checkbox `[x]`**: Treated as done (same as plain `- Habit`)
 - **Checkbox `[ ]`**: Treated as skipped (entry ignored)
+
+### Habit Observations
+
+Add observations in the `## Notes` section to track details about your habits:
+
+```markdown
+## Notes
+
+- **Gym:** Train A - chest and triceps. Felt strong!
+- **Drink water:** Too much coffee today
+```
+
+The format is `- **HabitName:** observation text`. These observations appear when using `--history`.
 
 ## Usage
 
@@ -174,6 +190,37 @@ foam-habits --log "Drink water: 0.5L" --date 2025-01-01
 - **Unknown habits**: Logged with a warning (allows adding habits not in config)
 - **Missing file**: Creates the daily note from template
 
+### View Habit History
+
+See a timeline view of a specific habit with observations:
+
+```bash
+# View Gym history (last 4 weeks)
+foam-habits --history Gym
+
+# View last 8 weeks
+foam-habits --history "Drink water" --weeks 8
+```
+
+**Output:**
+
+```
+💪 Gym - Last 28 days
+Schedule: Mon/Wed/Fri  |  Started: 2025-01-01
+
+2025-01-05  █  Train A - chest and triceps
+2025-01-04  ░
+2025-01-03  █  Train B - back and biceps
+2025-01-02  █  Leg day. New PR on squats!
+...
+```
+
+The history view shows:
+- **Completion status**: Same symbols as heatmap (░▒▓█)
+- **Observations**: Notes from `## Notes` section (if any)
+- **Schedule**: Shows when the habit is scheduled
+- **Start date**: When tracking began (if configured)
+
 ### Options
 
 | Option            | Alias | Default | Description                                |
@@ -182,6 +229,7 @@ foam-habits --log "Drink water: 0.5L" --date 2025-01-01
 | `--current-month` | `-m`  | `false` | Show current month instead of last N weeks |
 | `--log`           | `-l`  | -       | Log a habit entry (e.g., `"Gym"` or `"Drink water: 0.5L"`) |
 | `--date`          | `-d`  | today   | Date for log entry (YYYY-MM-DD)            |
+| `--history`       | `-H`  | -       | Show habit timeline with observations      |
 | `--help`          | `-h`  | -       | Show colorized help with config reference  |
 
 ## Heatmap Legend

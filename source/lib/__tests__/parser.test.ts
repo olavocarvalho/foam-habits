@@ -1,6 +1,8 @@
 import test from 'ava';
 import {
 	extractHabitsSection,
+	extractNotesSection,
+	extractObservation,
 	parseHabitEntries,
 	parseFolderFromTemplate,
 } from '../parser.js';
@@ -386,4 +388,120 @@ test('parseHabitEntries: checkbox with emoji strips emoji', t => {
 	t.is(entries.length, 1);
 	t.is(entries[0]!.name, 'gym');
 	t.is(warnings.length, 0);
+});
+
+// extractNotesSection tests
+test('extractNotesSection: extracts notes section', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- Gym
+
+## Notes
+
+- **Gym:** Train A - chest and triceps
+Regular notes here.`;
+
+	const result = extractNotesSection(content);
+	t.truthy(result);
+	t.true(result!.includes('**Gym:**'));
+	t.true(result!.includes('Train A'));
+});
+
+test('extractNotesSection: returns undefined when no notes section', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- Gym`;
+
+	t.is(extractNotesSection(content), undefined);
+});
+
+test('extractNotesSection: handles "Note" singular', t => {
+	const content = `# 2025-01-01
+
+## Note
+
+Some notes here.`;
+
+	const result = extractNotesSection(content);
+	t.truthy(result);
+	t.true(result!.includes('Some notes here'));
+});
+
+test('extractNotesSection: stops at next section', t => {
+	const content = `# 2025-01-01
+
+## Notes
+
+My notes
+
+## Summary
+
+This should not be included`;
+
+	const result = extractNotesSection(content);
+	t.truthy(result);
+	t.true(result!.includes('My notes'));
+	t.false(result!.includes('This should not be included'));
+});
+
+// extractObservation tests
+test('extractObservation: extracts observation for habit', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- Gym
+
+## Notes
+
+- **Gym:** Train A - chest and triceps
+- **Drink water:** Too much soda today`;
+
+	t.is(extractObservation(content, 'Gym'), 'Train A - chest and triceps');
+	t.is(extractObservation(content, 'Drink water'), 'Too much soda today');
+});
+
+test('extractObservation: case insensitive matching', t => {
+	const content = `# 2025-01-01
+
+## Notes
+
+- **Gym:** Upper body workout`;
+
+	t.is(extractObservation(content, 'gym'), 'Upper body workout');
+	t.is(extractObservation(content, 'GYM'), 'Upper body workout');
+});
+
+test('extractObservation: returns undefined for missing observation', t => {
+	const content = `# 2025-01-01
+
+## Notes
+
+- **Gym:** Train A`;
+
+	t.is(extractObservation(content, 'Meditation'), undefined);
+});
+
+test('extractObservation: returns undefined when no notes section', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- Gym`;
+
+	t.is(extractObservation(content, 'Gym'), undefined);
+});
+
+test('extractObservation: handles asterisk list marker', t => {
+	const content = `# 2025-01-01
+
+## Notes
+
+* **Gym:** Leg day`;
+
+	t.is(extractObservation(content, 'Gym'), 'Leg day');
 });
