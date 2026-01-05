@@ -2,33 +2,17 @@
 import React from 'react';
 import {render} from 'ink';
 import meow from 'meow';
+import chalk from 'chalk';
 import {format} from 'date-fns';
 import App from './app.js';
 import {loadConfig, getRootDir, ConfigNotFoundError} from './lib/config.js';
 import {logHabit} from './lib/logger.js';
 
 const cli = meow(
-	`
-	Usage
-	  $ foam-habits [options]
-
-	Options
-	  --weeks, -w          Number of weeks to display (default: 4)
-	  --current-month      Show current month only
-	  --reference-date     Reference date for calculations (YYYY-MM-DD)
-	  --log, -l            Log a habit entry (e.g., "Gym" or "Drink water: 0.5L")
-	  --date, -d           Date for log entry (YYYY-MM-DD, default: today)
-	  --help               Show this help
-
-	Examples
-	  $ foam-habits
-	  $ foam-habits --weeks 12
-	  $ foam-habits --current-month
-	  $ foam-habits --log "Gym"
-	  $ foam-habits --log "Drink water: 0.5L" --date 2025-01-05
-`,
+	`foam-habits - Terminal habit tracker for Foam daily notes`,
 	{
 		importMeta: import.meta,
+		autoHelp: false,
 		flags: {
 			weeks: {
 				type: 'number',
@@ -37,6 +21,7 @@ const cli = meow(
 			},
 			currentMonth: {
 				type: 'boolean',
+				shortFlag: 'm',
 				default: false,
 			},
 			referenceDate: {
@@ -49,6 +34,10 @@ const cli = meow(
 			date: {
 				type: 'string',
 				shortFlag: 'd',
+			},
+			help: {
+				type: 'boolean',
+				shortFlag: 'h',
 			},
 		},
 	},
@@ -69,6 +58,39 @@ function parseDateString(
 		month: parseInt(match[2]!, 10) - 1, // 0-indexed
 		day: parseInt(match[3]!, 10),
 	};
+}
+
+// Handle --help flag: show colorized help and exit
+// Note: meow creates both 'help' and 'h' properties separately
+if (cli.flags.help || cli.flags['h']) {
+	console.log(`
+${chalk.bold('foam-habits')} - Terminal habit tracker for Foam daily notes
+
+${chalk.cyan.bold('Usage')}
+  $ foam-habits [options]
+
+${chalk.cyan.bold('Options')}
+  ${chalk.green('--weeks, -w')}          Number of weeks to display ${chalk.dim('(default: 4)')}
+  ${chalk.green('--current-month, -m')}  Show current month only
+  ${chalk.green('--log, -l')}            Log a habit entry
+  ${chalk.green('--date, -d')}           Date for log entry ${chalk.dim('(default: today)')}
+  ${chalk.green('--help, -h')}           Show this help
+
+${chalk.cyan.bold('Examples')}
+  ${chalk.yellow('$ foam-habits --weeks 12')}
+  ${chalk.yellow('$ foam-habits --log "Gym"')}
+  ${chalk.yellow('$ foam-habits --log "Drink water: 0.5L" --date 2025-01-05')}
+
+${chalk.cyan.bold('Config')} ${chalk.dim('(.foam/habits.yaml)')}
+  ${chalk.dim('habits:')}
+  ${chalk.dim('  Gym:')}
+  ${chalk.dim('    emoji: 💪      # optional (default: 🔹)')}
+  ${chalk.dim('  Drink water:')}
+  ${chalk.dim('    goal: 4L')}
+
+  ${chalk.blue.underline('https://github.com/olavocarvalho/foam-habits#configuration')}
+`);
+	process.exit(0);
 }
 
 // Handle --log flag: log a habit and exit

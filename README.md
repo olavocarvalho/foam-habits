@@ -34,22 +34,17 @@ habits:
     goal: 4L
 
   Study:
-    emoji: 📖
     goal: 30min
     threshold: 0.8 # Consider done at 80% (24min)
 
-  Meditation:
-    emoji: 🧘
-
-  Mobility:
-    emoji: 🤸
+  Meditation: {}  # Minimal config (uses default 🔹 emoji)
 ```
 
 ### Habit Options
 
 | Option       | Type             | Default  | Description                                                 |
 | ------------ | ---------------- | -------- | ----------------------------------------------------------- |
-| `emoji`      | string           | required | Emoji displayed next to habit name                          |
+| `emoji`      | string           | `🔹`     | Emoji displayed next to habit name                          |
 | `goal`       | string           | -        | Target value with unit (e.g., `"4L"`, `"30min"`, `"2.5km"`) |
 | `threshold`  | number           | `1.0`    | Percentage (0.0-1.0) of goal to consider habit "done"       |
 | `start-date` | string           | -        | Date (YYYY-MM-DD) when habit tracking begins                |
@@ -187,7 +182,7 @@ foam-habits --log "Drink water: 0.5L" --date 2025-01-01
 | `--current-month` | `-m`  | `false` | Show current month instead of last N weeks |
 | `--log`           | `-l`  | -       | Log a habit entry (e.g., `"Gym"` or `"Drink water: 0.5L"`) |
 | `--date`          | `-d`  | today   | Date for log entry (YYYY-MM-DD)            |
-| `--help`          | `-h`  | -       | Show help                                  |
+| `--help`          | `-h`  | -       | Show colorized help with config reference  |
 
 ## Heatmap Legend
 
@@ -229,7 +224,7 @@ npm run dev     # Watch mode
 
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
-  theme:
+  config:
     complete: green
     partial: yellow
     low: red

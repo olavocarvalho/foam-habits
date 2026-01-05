@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.0] - 2026-01-05
+
+### Added
+- Enhanced `--help` / `-h` with colorized output using chalk
+- Config file reference in help showing sample `habits.yaml` structure
+- Link to documentation in help output
+
+### Changed
+- `emoji` is now optional in habit config (default: `🔹` for alignment consistency)
+- Habits can now be defined minimally as `HabitName: {}`
+
 ## [1.4.1] - 2026-01-05
 
 ### Changed

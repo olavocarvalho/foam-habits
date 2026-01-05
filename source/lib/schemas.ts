@@ -41,9 +41,12 @@ export const ScheduleSchema = z
 	.default('daily');
 export type Schedule = z.infer<typeof ScheduleSchema>;
 
+// Default emoji for habits without custom emoji
+export const DEFAULT_EMOJI = '🔹';
+
 // Single habit definition in config (.foam/habits.yaml)
 export const HabitConfigSchema = z.object({
-	emoji: z.string().min(1),
+	emoji: z.string().min(1).optional(),
 	// Goal with unit, e.g., "4L", "30min", "2.5km" (optional for boolean habits)
 	goal: z.string().optional(),
 	// Threshold percentage to consider habit "done" (0.0 - 1.0, default 1.0 = 100%)

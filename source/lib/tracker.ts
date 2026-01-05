@@ -16,6 +16,7 @@ import {
 	type Schedule,
 	type Day,
 	parseGoal,
+	DEFAULT_EMOJI,
 } from './schemas.js';
 
 /**
@@ -210,7 +211,7 @@ export function aggregateHabits(
 
 		habits.push({
 			name: habitKey,
-			emoji: habitConfig.emoji,
+			emoji: habitConfig.emoji ?? DEFAULT_EMOJI,
 			goal: goalValue,
 			unit: goalUnit,
 			threshold,
