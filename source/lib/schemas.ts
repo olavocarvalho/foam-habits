@@ -52,12 +52,19 @@ export const HabitConfigSchema = z.object({
 	'start-date': z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 	// Schedule for habit tracking: daily (default), weekdays, weekends, or custom day array
 	schedule: ScheduleSchema,
+});
+
+// Global config section in habits.yaml
+export const GlobalConfigSchema = z.object({
 	// Use checkbox format "- [x] Habit" when logging via CLI (default: false = "- Habit")
-	checkbox: z.boolean().optional(),
+	checkbox: z.boolean().default(false),
 });
 
 // Full habits.yaml config
 export const ConfigSchema = z.object({
+	// Global configuration options
+	config: GlobalConfigSchema.optional(),
+	// Habit definitions
 	habits: z.record(z.string(), HabitConfigSchema),
 });
 
@@ -92,6 +99,7 @@ export const ViewArgsSchema = z.object({
 
 // Types inferred from schemas
 export type HabitConfig = z.infer<typeof HabitConfigSchema>;
+export type GlobalConfig = z.infer<typeof GlobalConfigSchema>;
 export type Config = z.infer<typeof ConfigSchema>;
 export type HabitEntry = z.infer<typeof HabitEntrySchema>;
 export type HabitData = z.infer<typeof HabitDataSchema>;

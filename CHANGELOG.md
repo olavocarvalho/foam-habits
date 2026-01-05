@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.1] - 2026-01-05
+
+### Changed
+- Moved `checkbox` from per-habit option to global `config` section for consistency
+- Added `config` section to habits.yaml for global settings (prepares for future options like colors)
+
 ## [1.4.0] - 2026-01-05
 
 ### Added

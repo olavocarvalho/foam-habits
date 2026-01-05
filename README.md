@@ -54,11 +54,28 @@ habits:
 | `threshold`  | number           | `1.0`    | Percentage (0.0-1.0) of goal to consider habit "done"       |
 | `start-date` | string           | -        | Date (YYYY-MM-DD) when habit tracking begins                |
 | `schedule`   | string or array  | `daily`  | Days the habit applies: `daily`, `weekdays`, `weekends`, or `['mon', 'wed', 'fri']` |
-| `checkbox`   | boolean          | `false`  | Use checkbox format `- [x] Habit` when logging via CLI      |
 
 **Boolean habits** (no goal): Present = complete. Just log the habit name.
 
 **Quantitative habits** (with goal): Track progress toward a target. The value is compared against the goal.
+
+### Global Config
+
+Add a `config` section for global settings:
+
+```yaml
+config:
+  checkbox: true  # Use "- [x] Habit" format when logging
+
+habits:
+  Gym:
+    emoji: 💪
+  # ...
+```
+
+| Option     | Type    | Default | Description                                          |
+| ---------- | ------- | ------- | ---------------------------------------------------- |
+| `checkbox` | boolean | `false` | Use checkbox format `- [x] Habit` when logging via CLI |
 
 ### Advanced Configuration Example
 

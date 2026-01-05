@@ -199,15 +199,14 @@ export function updateHabitEntry(
 	habitName: string,
 	value: number | undefined,
 	unit: string | undefined,
-	habitConfig: HabitConfig | undefined,
+	hasGoal: boolean,
+	useCheckbox: boolean,
 ): {
 	content: string;
 	action: 'added' | 'updated' | 'skipped';
 	previousValue?: number;
 	newValue?: number;
 } {
-	const useCheckbox = habitConfig?.checkbox ?? false;
-	const hasGoal = habitConfig?.goal !== undefined;
 
 	// Check if ## Habits section exists
 	const habitsSection = extractHabitsSection(content);
@@ -371,12 +370,15 @@ export function logHabit(
 	}
 
 	// Update content with habit entry
+	const hasGoal = habitMatch?.config.goal !== undefined;
+	const useCheckbox = config.config?.checkbox ?? false;
 	const result = updateHabitEntry(
 		content,
 		habitMatch?.key ?? habitName,
 		value,
 		unit,
-		habitMatch?.config,
+		hasGoal,
+		useCheckbox,
 	);
 
 	// Ensure journal directory exists

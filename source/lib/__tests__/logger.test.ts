@@ -26,12 +26,6 @@ const mockConfig: Config = {
 			schedule: 'daily',
 		},
 		Meditation: {emoji: '🧘', threshold: 1.0, schedule: 'daily'},
-		'With Checkbox': {
-			emoji: '✅',
-			threshold: 1.0,
-			schedule: 'daily',
-			checkbox: true,
-		},
 	},
 };
 
@@ -188,7 +182,8 @@ test('updateHabitEntry: adds new entry to existing section', t => {
 		'Meditation',
 		undefined,
 		undefined,
-		mockConfig.habits['Meditation'],
+		false, // hasGoal
+		false, // useCheckbox
 	);
 
 	t.is(result.action, 'added');
@@ -207,7 +202,8 @@ Some notes`;
 		'Gym',
 		undefined,
 		undefined,
-		mockConfig.habits['Gym'],
+		false, // hasGoal
+		false, // useCheckbox
 	);
 
 	t.is(result.action, 'added');
@@ -233,7 +229,8 @@ test('updateHabitEntry: sums value for goal-oriented habit', t => {
 		'Drink water',
 		1.5,
 		'L',
-		mockConfig.habits['Drink water'],
+		true, // hasGoal
+		false, // useCheckbox
 	);
 
 	t.is(result.action, 'updated');
@@ -257,7 +254,8 @@ test('updateHabitEntry: skips duplicate boolean habit', t => {
 		'Gym',
 		undefined,
 		undefined,
-		mockConfig.habits['Gym'],
+		false, // hasGoal
+		false, // useCheckbox
 	);
 
 	t.is(result.action, 'skipped');
@@ -274,14 +272,15 @@ test('updateHabitEntry: uses checkbox format when configured', t => {
 `;
 	const result = updateHabitEntry(
 		content,
-		'With Checkbox',
+		'Gym',
 		undefined,
 		undefined,
-		mockConfig.habits['With Checkbox'],
+		false, // hasGoal
+		true, // useCheckbox (global config)
 	);
 
 	t.is(result.action, 'added');
-	t.true(result.content.includes('- [x] With Checkbox'));
+	t.true(result.content.includes('- [x] Gym'));
 });
 
 test('updateHabitEntry: adds entry at end of habits section', t => {
@@ -299,7 +298,8 @@ Some notes`;
 		'Gym',
 		undefined,
 		undefined,
-		mockConfig.habits['Gym'],
+		false, // hasGoal
+		false, // useCheckbox
 	);
 
 	t.is(result.action, 'added');
