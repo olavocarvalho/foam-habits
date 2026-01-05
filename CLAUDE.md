@@ -145,7 +145,7 @@ foam-habits --current-month  # Current month only
 
 ## Testing
 
-42 unit tests using ava:
+85 tests using ava:
 ```bash
 npm test
 ```
@@ -154,8 +154,10 @@ Tests cover:
 - `parseGoal()` - goal string parsing
 - `getCompletionLevel()` - completion level calculation
 - `extractHabitsSection()` - markdown section extraction
-- `parseHabitEntries()` - habit entry parsing
+- `parseHabitEntries()` - habit entry parsing (including emoji stripping, checkboxes)
 - `parseFolderFromTemplate()` - journal folder inference
+- `isScheduledForDate()` - schedule validation
+- E2E tests with Tim Maia fixture
 
 ## Extending
 
@@ -173,3 +175,78 @@ Tests cover:
 1. Update `HabitConfigSchema` in `schemas.ts`
 2. Handle in `aggregateHabits()` in `tracker.ts`
 3. Use in components as needed
+
+## Development Workflows
+
+### Feature Development
+
+When implementing a new feature from the roadmap:
+
+1. **Pick feature from roadmap**: Check `README.md > Roadmap > Next` for the next feature to implement
+
+2. **Plan implementation**: Create a plan covering:
+   - Files to modify
+   - Schema changes (if any)
+   - Parser/tracker changes (if any)
+   - Component changes (if any)
+   - Required unit tests
+
+3. **Implement with tests**:
+   - Write unit tests in `source/lib/__tests__/` for new functions
+   - Follow existing test patterns (ava framework)
+   - Aim for coverage of happy path + edge cases
+
+4. **Update fixture and E2E tests**:
+   - Update `fixtures/generate-tim-maia.js` to demonstrate new feature
+   - Regenerate fixture: `node fixtures/generate-tim-maia.js`
+   - Update `source/lib/__tests__/e2e.test.ts` with new assertions
+   - Verify CLI works: `cd fixtures/tim-maia && ../../dist/cli.js --reference-date 1989-04-06 --weeks 5`
+
+5. **Update documentation**:
+   - Update `README.md` with new feature documentation
+   - Remove implemented feature from `Roadmap > Next`
+
+6. **Verify all tests pass**: `npm test`
+
+### Version Release
+
+When releasing a new version:
+
+1. **Update CHANGELOG.md**:
+   ```markdown
+   ## [X.Y.Z] - YYYY-MM-DD
+
+   ### Added
+   - New feature description
+
+   ### Changed
+   - Changed behavior description
+
+   ### Fixed
+   - Bug fix description
+   ```
+
+2. **Ensure README.md is updated**:
+   - New features documented in relevant sections
+   - Implemented features removed from Roadmap
+
+3. **Commit changes**:
+   ```bash
+   git add -A
+   git commit -m "feat: description of changes"
+   ```
+
+4. **Bump version and tag**:
+   ```bash
+   npm version <major|minor|patch>  # Creates commit + tag
+   ```
+   - **major**: Breaking changes
+   - **minor**: New features (backward compatible)
+   - **patch**: Bug fixes
+
+5. **Push to remote**:
+   ```bash
+   git push && git push --tags
+   ```
+
+6. **CI/CD publishes to npm**: GitHub Actions handles npm publish on new tags
