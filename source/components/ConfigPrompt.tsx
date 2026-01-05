@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Text, useApp} from 'ink';
 import SelectInput from 'ink-select-input';
-import {PALETTE} from '../lib/palette.js';
+import {PALETTE} from '../lib/theme.js';
 
 type Props = {
 	onCreateConfig: () => void;

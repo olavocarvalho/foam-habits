@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Text} from 'ink';
 import {format, parseISO} from 'date-fns';
-import {PALETTE} from '../lib/palette.js';
+import {PALETTE} from '../lib/theme.js';
 import {padEndVisual} from '../lib/string-utils.js';
 
 type Props = {

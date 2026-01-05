@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Text} from 'ink';
 import Cell from './Cell.js';
 import {type HabitData} from '../lib/schemas.js';
-import {PALETTE} from '../lib/palette.js';
+import {PALETTE} from '../lib/theme.js';
 import {getCompletionLevel} from '../lib/tracker.js';
 import {truncateVisual, stripVariationSelectors} from '../lib/string-utils.js';
 

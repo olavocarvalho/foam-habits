@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2] - 2026-01-05
+
+### Changed
+- Aligned schedule display with habit name in history view
+- Consolidated `SYMBOLS`, `LEVEL_COLORS`, `CompletionLevel` into `theme.ts`
+- Renamed `palette.ts` → `theme.ts`
+
 ## [1.6.1] - 2026-01-05
 
 ### Added

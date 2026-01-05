@@ -1,25 +1,14 @@
 import React from 'react';
 import {Box, Text} from 'ink';
-import {PALETTE} from '../lib/palette.js';
+import {
+	PALETTE,
+	SYMBOLS,
+	LEVEL_COLORS,
+	type CompletionLevel,
+} from '../lib/theme.js';
 import {isScheduledForDate} from '../lib/tracker.js';
 import type {HistoryEntry} from '../lib/parser.js';
 import type {Schedule} from '../lib/schemas.js';
-
-type CompletionLevel = 0 | 1 | 2 | 3;
-
-const SYMBOLS: Record<CompletionLevel, string> = {
-	0: '░', // Not done
-	1: '▒', // Low (<50%)
-	2: '▓', // Partial (50-79%)
-	3: '█', // Complete (80%+)
-};
-
-const COLORS: Record<CompletionLevel, string> = {
-	0: PALETTE.dimmed,
-	1: PALETTE.red,
-	2: PALETTE.yellow,
-	3: PALETTE.green,
-};
 
 type Props = {
 	habitName: string;
@@ -138,7 +127,7 @@ export default function HistoryView({
 				{emoji} {capitalizedName} - Last {weeks * 7} days
 			</Text>
 			<Box>
-				<Text dimColor>Schedule: </Text>
+				<Text>  Schedule: </Text>
 				<ScheduleDisplay schedule={schedule} />
 				{habitStartDate && (
 					<Text dimColor>  |  Started: {habitStartDate}</Text>
@@ -164,7 +153,7 @@ export default function HistoryView({
 				}
 
 				const level = getCompletionLevel(entry?.value, goal, threshold);
-				const color = COLORS[level];
+				const color = LEVEL_COLORS[level];
 				const symbol = SYMBOLS[level];
 
 				// Format value display

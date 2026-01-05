@@ -5,7 +5,7 @@ import Heatmap from './components/Heatmap.js';
 import Warnings from './components/Warnings.js';
 import ConfigPrompt from './components/ConfigPrompt.js';
 import {useHabitData} from './hooks/useHabitData.js';
-import {PALETTE} from './lib/palette.js';
+import {PALETTE} from './lib/theme.js';
 import {type ViewArgs} from './lib/schemas.js';
 import {ConfigNotFoundError, createDefaultConfig} from './lib/config.js';
 

@@ -41,7 +41,7 @@ foam-habits/
 │       ├── config.ts        # Load habits.yaml
 │       ├── parser.ts        # Parse journal markdown files
 │       ├── tracker.ts       # Aggregate data, calculate streaks
-│       ├── palette.ts       # Color constants
+│       ├── theme.ts         # Theme: colors, symbols, completion levels
 │       └── string-utils.ts  # Visual string width utilities
 │
 ├── dist/                    # Compiled JavaScript (npm publish)
@@ -164,7 +164,7 @@ Tests cover:
 ### Adding a new component
 1. Create in `source/components/`
 2. Use Ink's `Box` and `Text` components
-3. Import color constants from `lib/palette.ts`
+3. Import theme constants from `lib/theme.ts`
 
 ### Adding a new CLI option
 1. Add flag in `source/cli.tsx` meow config

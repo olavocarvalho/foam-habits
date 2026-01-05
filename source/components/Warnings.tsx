@@ -1,6 +1,6 @@
 import { Box, Static, Text } from 'ink';
 import React from 'react';
-import { PALETTE } from '../lib/palette.js';
+import {PALETTE} from '../lib/theme.js';
 
 type Props = {
 	warnings: string[];
