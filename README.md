@@ -47,15 +47,37 @@ habits:
 
 ### Habit Options
 
-| Option      | Type   | Default  | Description                                                 |
-| ----------- | ------ | -------- | ----------------------------------------------------------- |
-| `emoji`     | string | required | Emoji displayed next to habit name                          |
-| `goal`      | string | -        | Target value with unit (e.g., `"4L"`, `"30min"`, `"2.5km"`) |
-| `threshold` | number | `1.0`    | Percentage (0.0-1.0) of goal to consider habit "done"       |
+| Option       | Type             | Default  | Description                                                 |
+| ------------ | ---------------- | -------- | ----------------------------------------------------------- |
+| `emoji`      | string           | required | Emoji displayed next to habit name                          |
+| `goal`       | string           | -        | Target value with unit (e.g., `"4L"`, `"30min"`, `"2.5km"`) |
+| `threshold`  | number           | `1.0`    | Percentage (0.0-1.0) of goal to consider habit "done"       |
+| `start-date` | string           | -        | Date (YYYY-MM-DD) when habit tracking begins                |
+| `schedule`   | string or array  | `daily`  | Days the habit applies: `daily`, `weekdays`, `weekends`, or `['mon', 'wed', 'fri']` |
 
 **Boolean habits** (no goal): Present = complete. Just log the habit name.
 
 **Quantitative habits** (with goal): Track progress toward a target. The value is compared against the goal.
+
+### Advanced Configuration Example
+
+```yaml
+habits:
+  Gym:
+    emoji: 💪
+    schedule: [mon, wed, fri]    # Only Mon/Wed/Fri
+    start-date: 2025-01-01       # Don't show before this date
+
+  Meditation:
+    emoji: 🧘
+    schedule: weekdays           # Mon-Fri only
+
+  Family time:
+    emoji: 👨‍👩‍👧
+    schedule: weekends           # Sat-Sun only
+```
+
+Days before `start-date` and non-scheduled days appear as blank (` `) instead of missed (`░`).
 
 ## Journal Format
 
@@ -83,6 +105,23 @@ Today was productive...
 - **Quantitative habit**: Name followed by colon and value (e.g., `- Drink water: 3.5L`)
 
 The habit name matching is case-insensitive.
+
+### Alternative Formats
+
+You can also use emojis and checkboxes in your journal entries:
+
+```markdown
+## Habits
+
+- 💪 Gym                    # Emoji prefix (stripped when matching)
+- [x] Meditation            # Checkbox format
+- [x] 💧 Drink water: 3.5L  # Both combined
+- [ ] Study                 # Unchecked = skipped (not logged)
+```
+
+- **Emoji prefix**: Leading emojis are stripped before matching against config
+- **Checkbox `[x]`**: Treated as done (same as plain `- Habit`)
+- **Checkbox `[ ]`**: Treated as skipped (entry ignored)
 
 ## Usage
 
@@ -146,37 +185,6 @@ npm run dev     # Watch mode
 
 ### Next
 
-- [ ] **Habit start date**: Differentiate between days when a habit wasn't tracked yet vs days when it was skipped. Add optional `start-date` config:
-  ```yaml
-  habits:
-    Gym:
-      emoji: 💪
-      start-date: 2025-01-01 # Days before this show as " " instead of "░"
-  ```
-  This prevents old days from appearing as "missed" when you add a new habit.
-
-- [ ] **Weekly schedule per habit**: Define which days of the week each habit applies. Non-scheduled days show as blank instead of missed:
-  ```yaml
-  habits:
-    Gym:
-      emoji: 💪
-      schedule: [mon, wed, fri]    # Custom days
-
-    Meditation:
-      emoji: 🧘
-      schedule: weekdays           # Mon-Fri shortcut
-
-    Family time:
-      emoji: 👨‍👩‍👧
-      schedule: weekends           # Sat-Sun shortcut
-  ```
-  - `daily` = all days (default, current behavior)
-  - `weekdays` = Monday through Friday
-  - `weekends` = Saturday and Sunday
-  - `[mon, tue, wed, thu, fri, sat, sun]` = custom array
-
-  Streaks skip non-scheduled days (e.g., Mon-Wed-Fri consistency = unbroken streak).
-
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
   theme:
@@ -186,27 +194,6 @@ npm run dev     # Watch mode
     title: cyan
   ```
   Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
-
-- [ ] **Strip emojis from journal entries**: When parsing daily notes, strip emojis from habit names before matching against `habits.yaml`. This allows using emojis in journal entries for a nicer writing experience:
-  ```markdown
-  ## Habits
-  - 💪 Gym
-  - 💧 Drink water: 3.5L
-  ```
-  Would match `Gym` and `Drink water` in the config. The emoji in the config remains the source of truth for display.
-
-- [ ] **Markdown checkbox support**: Support optional markdown checkboxes in habit entries. This allows habits to be used as a checklist in your daily note:
-  ```markdown
-  ## Habits
-  - [x] Gym
-  - [ ] Meditation
-  - [x] Drink water: 3.5L
-  ```
-  - `- [x]` or `- [X]` = habit done (boolean) or value logged (quantitative)
-  - `- [ ]` = habit explicitly not done (skip for the day)
-  - `- Habit` = current behavior, presence means done
-
-  Both styles should work, allowing users to choose their preferred journaling format.
 
 ### Later
 
