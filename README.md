@@ -141,16 +141,27 @@ You can also use emojis and checkboxes in your journal entries:
 
 ### Habit Observations
 
-Add observations in the `## Notes` section to track details about your habits:
+Add observations to track details about your habits. They can be placed in two locations:
 
+**In the intro area** (between `# Title` and first `##` section):
+```markdown
+# 2025-01-05
+
+- **Gym:** Train A - chest and triceps
+
+## Habits
+- Gym
+```
+
+**In the `## Notes` section**:
 ```markdown
 ## Notes
 
-- **Gym:** Train A - chest and triceps. Felt strong!
-- **Drink water:** Too much coffee today
+- **Gym:** Felt strong today!
+- **Drink water:** Too much coffee
 ```
 
-The format is `- **HabitName:** observation text`. These observations appear when using `--history`.
+The format is `- **HabitName:** observation text`. If observations exist in both locations, they're merged with ` | ` separator. These observations appear when using `--history`.
 
 ## Usage
 
@@ -206,7 +217,7 @@ foam-habits --history "Drink water" --weeks 8
 
 ```
 💪 Gym - Last 28 days
-Schedule: Mon/Wed/Fri  |  Started: 2025-01-01
+  Schedule: Mon / Tue / Wed / Thu / Fri / Sat / Sun  |  Started: 2025-01-01
 
 2025-01-05  █  Train A - chest and triceps
 2025-01-04  ░
@@ -217,8 +228,8 @@ Schedule: Mon/Wed/Fri  |  Started: 2025-01-01
 
 The history view shows:
 - **Completion status**: Same symbols as heatmap (░▒▓█)
-- **Observations**: Notes from `## Notes` section (if any)
-- **Schedule**: Shows when the habit is scheduled
+- **Observations**: From intro area and `## Notes` sections (merged with ` | ` if both exist)
+- **Schedule**: All 7 days shown, with scheduled days highlighted
 - **Start date**: When tracking began (if configured)
 
 ### Options
