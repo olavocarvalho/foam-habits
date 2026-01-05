@@ -1,7 +1,7 @@
 import React, {useState, useCallback} from 'react';
 import {Box, Text} from 'ink';
 import Spinner from 'ink-spinner';
-import Heatmap from './components/Heatmap.js';
+import HeatmapView from './components/HeatmapView.js';
 import Warnings from './components/Warnings.js';
 import ConfigPrompt from './components/ConfigPrompt.js';
 import {useHabitData} from './hooks/useHabitData.js';
@@ -38,7 +38,7 @@ export default function App({weeks, currentMonth, referenceDate}: Props) {
 				<Text color={PALETTE.green}>Created {createdPath}</Text>
 				<Text> </Text>
 				<Warnings warnings={warnings} />
-				<Heatmap
+				<HeatmapView
 					habits={habits}
 					dates={dates}
 					weeks={weeks}
@@ -75,7 +75,7 @@ export default function App({weeks, currentMonth, referenceDate}: Props) {
 		content = (
 			<Box flexDirection="column">
 				<Warnings warnings={warnings} />
-				<Heatmap
+				<HeatmapView
 					habits={habits}
 					dates={dates}
 					weeks={weeks}

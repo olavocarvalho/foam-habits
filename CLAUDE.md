@@ -31,7 +31,7 @@ foam-habits/
 │   │   ├── ConfigPrompt.tsx # Config creation prompt
 │   │   ├── HabitRow.tsx     # Habit row: emoji + name + cells + streak
 │   │   ├── Header.tsx       # Title + date column headers
-│   │   ├── Heatmap.tsx      # Main grid container
+│   │   ├── HeatmapView.tsx   # Main grid container
 │   │   ├── HistoryView.tsx  # Single habit timeline view
 │   │   ├── Legend.tsx       # Symbol legend footer
 │   │   └── Warnings.tsx     # Static warnings display

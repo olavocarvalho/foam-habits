@@ -295,8 +295,6 @@ npm run dev     # Watch mode
 
 - [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
 
-- [ ] **Normalize component naming**: Rename `Heatmap.tsx` → `HeatmapView.tsx` for consistency with `HistoryView.tsx`
-
 ## License
 
 MIT
