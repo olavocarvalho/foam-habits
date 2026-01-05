@@ -286,6 +286,8 @@ npm run dev     # Watch mode
   ░ not done  ▒ low  ▓ partial  █ complete
   ```
 
+- [ ] **Normalize component naming**: Rename `Heatmap.tsx` → `HeatmapView.tsx` for consistency with `HistoryView.tsx`
+
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
   config:
