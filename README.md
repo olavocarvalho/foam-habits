@@ -283,7 +283,7 @@ npm run dev     # Watch mode
 
 - [ ] **Legend component**: Add a footer legend to heatmap and history views explaining the symbols:
   ```
-  ░ not done  ▒ low  ▓ partial  █ complete
+  ░ not done  ▒ low  ▓ partial  █ well done
   ```
 
 - [ ] **Normalize component naming**: Rename `Heatmap.tsx` → `HeatmapView.tsx` for consistency with `HistoryView.tsx`
@@ -292,7 +292,8 @@ npm run dev     # Watch mode
   ```yaml
   config:
     colors:
-      accent: cyan      # Titles, scheduled days, highlights (default: purple)
+      accent: cyan        # Titles, scheduled days, highlights (default: purple)
+      accent-light: gray  # Subtitles, secondary text (default: dimmed purple)
       complete: green
       partial: yellow
       low: red
