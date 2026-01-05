@@ -1,5 +1,5 @@
 export const DEFAULT_PALETTE = {
-	accent: '#9EA5FF',
+	accent: '#626BE2',
 	accentLight: '#AAB1EF',
 	red: '#FC8897',
 	yellow: '#C0B435',

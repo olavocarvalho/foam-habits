@@ -1,6 +1,6 @@
+import { Text } from 'ink';
 import React from 'react';
-import {Text} from 'ink';
-import {SYMBOLS, LEVEL_COLORS, type CompletionLevel} from '../lib/theme.js';
+import { LEVEL_COLORS, SYMBOLS, type CompletionLevel } from '../lib/theme.js';
 
 type Props = {
 	level: CompletionLevel | null;

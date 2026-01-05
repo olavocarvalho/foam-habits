@@ -1,15 +1,15 @@
+import { Box, Text } from 'ink';
 import React from 'react';
-import {Box, Text} from 'ink';
-import Legend from './Legend.js';
+import type { HistoryEntry } from '../lib/parser.js';
+import type { Schedule } from '../lib/schemas.js';
 import {
-	PALETTE,
-	SYMBOLS,
-	LEVEL_COLORS,
-	type CompletionLevel,
+  LEVEL_COLORS,
+  PALETTE,
+  SYMBOLS,
+  type CompletionLevel,
 } from '../lib/theme.js';
-import {isScheduledForDate} from '../lib/tracker.js';
-import type {HistoryEntry} from '../lib/parser.js';
-import type {Schedule} from '../lib/schemas.js';
+import { isScheduledForDate } from '../lib/tracker.js';
+import Legend from './Legend.js';
 
 type Props = {
 	habitName: string;
@@ -128,7 +128,7 @@ export default function HistoryView({
 				{emoji} {capitalizedName} - Last {weeks * 7} days
 			</Text>
 			<Box>
-				<Text>  Schedule: </Text>
+				<Text>   Schedule: </Text>
 				<ScheduleDisplay schedule={schedule} />
 				{habitStartDate && (
 					<Text dimColor>  |  Started: {habitStartDate}</Text>

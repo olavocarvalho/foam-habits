@@ -1,8 +1,8 @@
+import { format, parseISO } from 'date-fns';
+import { Box, Text } from 'ink';
 import React from 'react';
-import {Box, Text} from 'ink';
-import {format, parseISO} from 'date-fns';
-import {PALETTE} from '../lib/theme.js';
-import {padEndVisual} from '../lib/string-utils.js';
+import { padEndVisual } from '../lib/string-utils.js';
+import { PALETTE } from '../lib/theme.js';
 
 type Props = {
 	dates: string[];

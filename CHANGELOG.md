@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1] - 2026-01-05
+
+### Changed
+- Updated default accent color from `#9EA5FF` to `#626BE2` (darker, more saturated purple)
+- Standardized import ordering across components (alphabetical)
+- Fixed alignment padding in history view schedule display
+
 ## [1.7.0] - 2026-01-05
 
 ### Added
