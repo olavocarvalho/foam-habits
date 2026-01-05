@@ -1,4 +1,5 @@
 import test from 'ava';
+import fs from 'node:fs';
 import path from 'node:path';
 import {execSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
@@ -247,6 +248,220 @@ test('e2e: CLI rejects invalid --reference-date', t => {
 
 	const error = t.throws(() => {
 		execSync(`node ${cliPath} --reference-date invalid-date`, {
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			stdio: 'pipe',
+		});
+	});
+
+	t.truthy(error);
+});
+
+// Test CLI --log flag creates a new daily note
+test.serial('e2e: CLI --log creates new daily note', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+	const testDate = '1989-04-07'; // Day after last fixture entry
+	const journalPath = path.join(FIXTURE_PATH, 'journal', `${testDate}.md`);
+
+	// Ensure file doesn't exist before test
+	if (fs.existsSync(journalPath)) {
+		fs.unlinkSync(journalPath);
+	}
+
+	try {
+		const output = execSync(
+			`node ${cliPath} --log "Wake up late" --date ${testDate}`,
+			{
+				cwd: FIXTURE_PATH,
+				encoding: 'utf8',
+			},
+		);
+
+		// Should show success message
+		t.true(output.includes('Created') || output.includes('Logged'));
+		t.true(output.includes(testDate));
+
+		// File should exist
+		t.true(fs.existsSync(journalPath));
+
+		// Content should include the habit
+		const content = fs.readFileSync(journalPath, 'utf8');
+		t.true(content.includes('- Wake up late'));
+		t.true(content.includes('## Habits'));
+	} finally {
+		// Cleanup
+		if (fs.existsSync(journalPath)) {
+			fs.unlinkSync(journalPath);
+		}
+	}
+});
+
+// Test CLI --log flag adds to existing file
+test.serial('e2e: CLI --log adds habit to existing file', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+	const testDate = '1989-04-08';
+	const journalPath = path.join(FIXTURE_PATH, 'journal', `${testDate}.md`);
+
+	// Create a test file first
+	const initialContent = `# ${testDate}
+
+## Habits
+
+- Gym
+
+## Notes
+
+Test notes.
+`;
+	fs.writeFileSync(journalPath, initialContent);
+
+	try {
+		const output = execSync(
+			`node ${cliPath} --log "Skip rehearsal" --date ${testDate}`,
+			{
+				cwd: FIXTURE_PATH,
+				encoding: 'utf8',
+			},
+		);
+
+		// Should show success message
+		t.true(output.includes('Logged'));
+
+		// Content should include both habits
+		const content = fs.readFileSync(journalPath, 'utf8');
+		t.true(content.includes('- Gym'));
+		t.true(content.includes('- Skip rehearsal'));
+	} finally {
+		// Cleanup
+		if (fs.existsSync(journalPath)) {
+			fs.unlinkSync(journalPath);
+		}
+	}
+});
+
+// Test CLI --log sums values for quantitative habits
+test.serial('e2e: CLI --log sums value for quantitative habit', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+	const testDate = '1989-04-09';
+	const journalPath = path.join(FIXTURE_PATH, 'journal', `${testDate}.md`);
+
+	// Create a test file with existing quantitative habit
+	const initialContent = `# ${testDate}
+
+## Habits
+
+- Drink whiskey: 0.5L
+
+## Notes
+
+`;
+	fs.writeFileSync(journalPath, initialContent);
+
+	try {
+		const output = execSync(
+			`node ${cliPath} --log "Drink whiskey: 0.3L" --date ${testDate}`,
+			{
+				cwd: FIXTURE_PATH,
+				encoding: 'utf8',
+			},
+		);
+
+		// Should show updated message with summed value
+		t.true(output.includes('Updated'));
+		t.true(output.includes('0.8L'));
+
+		// Content should have updated value
+		const content = fs.readFileSync(journalPath, 'utf8');
+		t.true(content.includes('0.8L'));
+		t.false(content.includes('0.5L')); // Old value should be gone
+	} finally {
+		// Cleanup
+		if (fs.existsSync(journalPath)) {
+			fs.unlinkSync(journalPath);
+		}
+	}
+});
+
+// Test CLI --log skips duplicate boolean habit
+test.serial('e2e: CLI --log skips duplicate boolean habit', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+	const testDate = '1989-04-10';
+	const journalPath = path.join(FIXTURE_PATH, 'journal', `${testDate}.md`);
+
+	// Create a test file with existing boolean habit
+	const initialContent = `# ${testDate}
+
+## Habits
+
+- Wake up late
+
+## Notes
+
+`;
+	fs.writeFileSync(journalPath, initialContent);
+
+	try {
+		const output = execSync(
+			`node ${cliPath} --log "Wake up late" --date ${testDate}`,
+			{
+				cwd: FIXTURE_PATH,
+				encoding: 'utf8',
+			},
+		);
+
+		// Should show skipped message
+		t.true(output.includes('already logged'));
+
+		// Content should be unchanged (still only one entry)
+		const content = fs.readFileSync(journalPath, 'utf8');
+		const matches = content.match(/- Wake up late/g);
+		t.is(matches?.length, 1);
+	} finally {
+		// Cleanup
+		if (fs.existsSync(journalPath)) {
+			fs.unlinkSync(journalPath);
+		}
+	}
+});
+
+// Test CLI --log warns for unknown habit
+test.serial('e2e: CLI --log warns for unknown habit', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+	const testDate = '1989-04-11';
+	const journalPath = path.join(FIXTURE_PATH, 'journal', `${testDate}.md`);
+
+	// Ensure file doesn't exist
+	if (fs.existsSync(journalPath)) {
+		fs.unlinkSync(journalPath);
+	}
+
+	try {
+		execSync(`node ${cliPath} --log "Unknown habit" --date ${testDate}`, {
+			cwd: FIXTURE_PATH,
+			encoding: 'utf8',
+			stdio: ['pipe', 'pipe', 'pipe'], // Capture stderr
+		});
+
+		// Should still create the file
+		t.true(fs.existsSync(journalPath));
+
+		// Content should include the unknown habit
+		const content = fs.readFileSync(journalPath, 'utf8');
+		t.true(content.includes('- Unknown habit'));
+	} finally {
+		// Cleanup
+		if (fs.existsSync(journalPath)) {
+			fs.unlinkSync(journalPath);
+		}
+	}
+});
+
+// Test CLI --log rejects invalid date
+test('e2e: CLI --log rejects invalid --date', t => {
+	const cliPath = path.resolve(__dirname, '../../../dist/cli.js');
+
+	const error = t.throws(() => {
+		execSync(`node ${cliPath} --log "Gym" --date invalid-date`, {
 			cwd: FIXTURE_PATH,
 			encoding: 'utf8',
 			stdio: 'pipe',

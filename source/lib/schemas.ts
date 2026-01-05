@@ -52,6 +52,8 @@ export const HabitConfigSchema = z.object({
 	'start-date': z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 	// Schedule for habit tracking: daily (default), weekdays, weekends, or custom day array
 	schedule: ScheduleSchema,
+	// Use checkbox format "- [x] Habit" when logging via CLI (default: false = "- Habit")
+	checkbox: z.boolean().optional(),
 });
 
 // Full habits.yaml config

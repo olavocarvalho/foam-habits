@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.4.0] - 2026-01-05
+
+### Added
+- `--log` / `-l` flag to log habits directly from CLI without opening daily notes
+- `--date` / `-d` flag to specify date for logging (defaults to today)
+- `checkbox` config option to use `- [x] Habit` format when logging via CLI
+- Automatic value summing for quantitative habits (e.g., `0.5L + 0.3L = 0.8L`)
+- Creates daily note from template if file doesn't exist
+- Warning for unknown habits (logs anyway for flexibility)
+
 ## [1.3.0] - 2026-01-05
 
 ### Added

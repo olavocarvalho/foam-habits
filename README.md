@@ -54,6 +54,7 @@ habits:
 | `threshold`  | number           | `1.0`    | Percentage (0.0-1.0) of goal to consider habit "done"       |
 | `start-date` | string           | -        | Date (YYYY-MM-DD) when habit tracking begins                |
 | `schedule`   | string or array  | `daily`  | Days the habit applies: `daily`, `weekdays`, `weekends`, or `['mon', 'wed', 'fri']` |
+| `checkbox`   | boolean          | `false`  | Use checkbox format `- [x] Habit` when logging via CLI      |
 
 **Boolean habits** (no goal): Present = complete. Just log the habit name.
 
@@ -139,12 +140,36 @@ foam-habits --current-month
 npx foam-habits --weeks 4
 ```
 
+### Log Habit from CLI
+
+Quickly log habits without opening your daily note:
+
+```bash
+# Log a boolean habit (today)
+foam-habits --log "Gym"
+foam-habits -l "Gym"
+
+# Log a quantitative habit
+foam-habits --log "Drink water: 0.5L"
+
+# Log to a specific date
+foam-habits --log "Drink water: 0.5L" --date 2025-01-01
+```
+
+**Behavior:**
+- **Boolean habits**: If already logged, the entry is skipped (no duplicates)
+- **Quantitative habits**: If already logged, values are summed (e.g., `0.5L + 0.3L = 0.8L`)
+- **Unknown habits**: Logged with a warning (allows adding habits not in config)
+- **Missing file**: Creates the daily note from template
+
 ### Options
 
 | Option            | Alias | Default | Description                                |
 | ----------------- | ----- | ------- | ------------------------------------------ |
 | `--weeks`         | `-w`  | `4`     | Number of weeks to display                 |
 | `--current-month` | `-m`  | `false` | Show current month instead of last N weeks |
+| `--log`           | `-l`  | -       | Log a habit entry (e.g., `"Gym"` or `"Drink water: 0.5L"`) |
+| `--date`          | `-d`  | today   | Date for log entry (YYYY-MM-DD)            |
 | `--help`          | `-h`  | -       | Show help                                  |
 
 ## Heatmap Legend
@@ -183,7 +208,7 @@ npm run dev     # Watch mode
 
 ## Roadmap
 
-### Next
+- [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
 
 - [ ] **Configurable color palette**: Allow customizing colors in `habits.yaml`:
   ```yaml
@@ -194,23 +219,6 @@ npm run dev     # Watch mode
     title: cyan
   ```
   Support both ANSI color names (theme-adaptive) and hex codes (exact colors).
-
-### Later
-
-- [ ] **Charts for quantitative habits**: Display line/bar charts for non-boolean habits using [ink-chart](https://github.com/pppp606/ink-chart). Show trends over time for habits like water intake, study minutes, etc.
-
-- [ ] **Log habit from CLI**: Quickly log habits without opening your daily note:
-  ```bash
-  # Log a boolean habit
-  npx foam-habits log "Gym"
-
-  # Log a quantitative habit
-  npx foam-habits log "Drink water: 0.5L"
-
-  # Log to a specific date
-  npx foam-habits log "Drink water: 0.5L" --reference-date 2025-01-01
-  ```
-  If the habit already exists in the note with a value, sum the new value (e.g., logging `0.5L` twice results in `1L`). Creates the daily note if it doesn't exist.
 
 ## License
 

@@ -229,3 +229,6 @@ console.log(`\nGenerated ${numDays} journal entries for Tim Maia fixture!`);
 console.log('\nTo test with this fixture:');
 console.log('  cd fixtures/tim-maia');
 console.log('  ../../dist/cli.js --reference-date 1989-04-06 --weeks 5');
+console.log('\nTo test logging:');
+console.log('  ../../dist/cli.js --log "Wake up late" --date 1989-04-07');
+console.log('  ../../dist/cli.js --log "Drink whiskey: 0.5L" --date 1989-04-07');
