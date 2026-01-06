@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2] - 2026-01-06
+
+### Fixed
+- `--log` now marks unchecked checkboxes `[ ]` as done `[x]` instead of reporting "already logged"
+- Updating quantitative habits now preserves original emoji and casing from template
+- Log message for marking checkboxes now shows "Marked as done" instead of "undefined → 1"
+
 ## [1.7.1] - 2026-01-05
 
 ### Changed

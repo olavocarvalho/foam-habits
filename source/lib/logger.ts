@@ -159,7 +159,7 @@ export function createDailyNote(rootDir: string, date: string): string {
 export function findExistingEntry(
 	habitsSection: string,
 	habitName: string,
-): {lineIndex: number; line: string; value: number | undefined} | undefined {
+): {lineIndex: number; line: string; value: number | undefined; isChecked: boolean} | undefined {
 	const lines = habitsSection.split('\n');
 	const lowerName = habitName.toLowerCase();
 
@@ -184,7 +184,12 @@ export function findExistingEntry(
 			const valueMatch = entryText.match(VALUE_REGEX);
 			const value = valueMatch?.[1] ? parseFloat(valueMatch[1]) : undefined;
 
-			return {lineIndex: i, line, value};
+			// Check if checkbox is checked (x/X) or no checkbox (also considered done)
+			// match[1] is undefined if no checkbox, 'x'/'X' if checked, ' ' if unchecked
+			const checkboxState = match[1];
+			const isChecked = checkboxState === undefined || checkboxState.toLowerCase() === 'x';
+
+			return {lineIndex: i, line, value, isChecked};
 		}
 	}
 
@@ -305,8 +310,12 @@ export function updateHabitEntry(
 
 			if (inHabitsSection) {
 				if (sectionLineIndex === existing.lineIndex) {
-					// Replace this line
-					lines[i] = formatHabitEntry(habitName, newValue, unit, useCheckbox);
+					// Update just the value portion, preserving emoji and casing
+					// Match ": <number><optional unit>" and replace with new value
+					lines[i] = line.replace(
+						/:\s*[\d.]+\s*\S*/,
+						`: ${newValue}${unit ?? ''}`,
+					);
 					break;
 				}
 				sectionLineIndex++;
@@ -318,6 +327,46 @@ export function updateHabitEntry(
 			action: 'updated',
 			previousValue,
 			newValue,
+		};
+	}
+
+	// Boolean habit - check if it needs to be marked as done
+	// Handle unchecked checkboxes even if useCheckbox config isn't set,
+	// since user may have manually added checkboxes in their file
+	if (!existing.isChecked) {
+		// Checkbox is unchecked, mark it as done
+		const lines = content.split('\n');
+
+		// Find the actual line index in the full content
+		let inHabitsSection = false;
+		let sectionLineIndex = 0;
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i]!;
+
+			if (/^##\s+habits?\s*$/i.test(line)) {
+				inHabitsSection = true;
+				continue;
+			}
+
+			if (inHabitsSection && /^##\s+/.test(line)) {
+				break;
+			}
+
+			if (inHabitsSection) {
+				if (sectionLineIndex === existing.lineIndex) {
+					// Replace unchecked checkbox with checked
+					lines[i] = line.replace(/\[ \]/, '[x]');
+					break;
+				}
+				sectionLineIndex++;
+			}
+		}
+
+		return {
+			content: lines.join('\n'),
+			action: 'updated',
+			newValue: 1,
 		};
 	}
 
@@ -405,9 +454,14 @@ export function logHabit(
 		message = `Logged "${displayName}" in ${relPath}`;
 		action = 'added';
 	} else if (result.action === 'updated') {
-		const prevStr = `${result.previousValue}${unit ?? ''}`;
-		const newStr = `${result.newValue}${unit ?? ''}`;
-		message = `Updated "${displayName}" in ${relPath}: ${prevStr} → ${newStr}`;
+		// Check if this was a checkbox being marked done (no previousValue) vs quantitative update
+		if (result.previousValue === undefined) {
+			message = `Marked "${displayName}" as done in ${relPath}`;
+		} else {
+			const prevStr = `${result.previousValue}${unit ?? ''}`;
+			const newStr = `${result.newValue}${unit ?? ''}`;
+			message = `Updated "${displayName}" in ${relPath}: ${prevStr} → ${newStr}`;
+		}
 		action = 'updated';
 	} else {
 		message = `"${displayName}" already logged in ${relPath}`;

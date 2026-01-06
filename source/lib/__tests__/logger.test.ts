@@ -140,11 +140,27 @@ test('findExistingEntry: finds entry with value', t => {
 	t.is(result?.value, 30);
 });
 
-test('findExistingEntry: handles checkbox format', t => {
+test('findExistingEntry: handles checked checkbox format', t => {
 	const section = '- [x] Gym\n- Study';
 	const result = findExistingEntry(section, 'gym');
 	t.truthy(result);
 	t.is(result?.lineIndex, 0);
+	t.true(result?.isChecked);
+});
+
+test('findExistingEntry: handles unchecked checkbox format', t => {
+	const section = '- [ ] Gym\n- Study';
+	const result = findExistingEntry(section, 'gym');
+	t.truthy(result);
+	t.is(result?.lineIndex, 0);
+	t.false(result?.isChecked);
+});
+
+test('findExistingEntry: entry without checkbox is considered checked', t => {
+	const section = '- Gym\n- Study';
+	const result = findExistingEntry(section, 'gym');
+	t.truthy(result);
+	t.true(result?.isChecked);
 });
 
 test('findExistingEntry: returns undefined if not found', t => {
@@ -310,6 +326,52 @@ Some notes`;
 	// But before Notes section
 	const notesIndex = result.content.indexOf('## Notes');
 	t.true(gymIndex < notesIndex);
+});
+
+test('updateHabitEntry: marks unchecked checkbox as done', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- [ ] Gym
+
+## Notes
+`;
+	// Should work even without useCheckbox config, since file already has checkbox
+	const result = updateHabitEntry(
+		content,
+		'Gym',
+		undefined,
+		undefined,
+		false, // hasGoal
+		false, // useCheckbox (not configured, but file has checkbox)
+	);
+
+	t.is(result.action, 'updated');
+	t.true(result.content.includes('- [x] Gym'));
+	t.false(result.content.includes('- [ ] Gym'));
+});
+
+test('updateHabitEntry: skips already checked checkbox', t => {
+	const content = `# 2025-01-01
+
+## Habits
+
+- [x] Gym
+
+## Notes
+`;
+	const result = updateHabitEntry(
+		content,
+		'Gym',
+		undefined,
+		undefined,
+		false, // hasGoal
+		false, // useCheckbox (not configured, but file has checkbox)
+	);
+
+	t.is(result.action, 'skipped');
+	t.is(result.content, content); // Unchanged
 });
 
 // processTemplate tests
